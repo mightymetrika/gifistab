@@ -64,3 +64,38 @@ summary.gstab_lm <- function(object, ...) {
 
 
 }
+
+#' Summary for Stability Analysis for Generalized Linear Models
+#'
+#' This function produces a summary of the stability analysis for a generalized linear model.
+#'
+#' @param object An object of class "gstab_glm", usually, a result of a call to gstab.glm.
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @return A list with the summary of the original model and the summaries of each stability check.
+#' @export
+summary.gstab_glm <- function(object, ...) {
+
+  # Apply each type of summary
+  original_summary <- broom::tidy(object$original)
+  replication_stability_summary <- summary_replication_stability(object$stability$replication_stability)
+  statistical_stability_summary <- summary_statistical_stability(object$stability$statistical_stability)
+  data_selection_stability_summary <- summary_data_selection_stability(object$stability$stability_under_data_selection)
+  model_selection_stability_summary <- summary_model_selection_stability(object$stability$stability_under_model_selection)
+  numerical_stability_summary <- summary_numerical_stability(object$stability$numerical_stability)
+  analytic_and_algebraic_stability_summary <- summary_analytic_and_algebraic_stability(object$stability$analytic_and_algebraic_stability)
+  technique_stability_summary <- summary_technique_stability(object$stability$stability_under_selection_of_technique)
+
+  # Creating output
+  out <- list(original_summary = original_summary,
+              replication_stability_summary = replication_stability_summary,
+              statistical_stability_summary = statistical_stability_summary,
+              data_selection_stability_summary = data_selection_stability_summary,
+              model_selection_stability_summary = model_selection_stability_summary,
+              numerical_stability_summary = numerical_stability_summary,
+              analytic_and_algebraic_stability_summary = analytic_and_algebraic_stability_summary,
+              technique_stability_summary = technique_stability_summary)
+
+  # Return output
+  return(out)
+}
