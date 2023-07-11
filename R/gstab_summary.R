@@ -1,3 +1,27 @@
+#' Summary of Stability Analysis for Linear Models
+#'
+#' This function generates a summary of the stability analysis performed by 'gstab.lm'. It summarizes the original model and each stability check, returning a list of these summaries.
+#'
+#' @param object An object of class 'gstab_lm'.
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @return A list with a summary of the original model and summaries of each stability check.
+#' @seealso
+#' \code{\link{gstab}} for performing the stability analysis,
+#' @export
+#' @examples
+#' # Assuming that `model` is an object of class 'gstab_lm'
+#' n <- 20
+#' set.seed(376)
+#' data <- data.frame(y = 3*stats::rnorm(n) +5,
+#'                    x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
+#'                    x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
+#'
+#' formula <- y ~ x1 + x2
+#' model <- stats::lm(formula, data = data)
+#'
+#' stab_res <- gstab(model = model, nboot = 100)
+#' summary(stab_res)
 summary.gstab_lm <- function(object, ...) {
 
   # Original model
@@ -40,35 +64,3 @@ summary.gstab_lm <- function(object, ...) {
 
 
 }
-
-
-
-# summary_replication_stability <- function(object) {
-#   new_model <- broom::tidy(object$new_model)
-#   boot_models <- handle_boot_model_summaries(object$boot_models)
-#   list(new_model = new_model, boot_models = boot_models)
-# }
-#
-# summary_statistical_stability <- function(object){
-#   tidy_list_elements(object$stability$statistical_stability)
-# }
-#
-# summary_data_selection_stability <- function(object){
-#   tidy_list_elements(object$stability$stability_under_data_selection)
-# }
-#
-# summary_model_selection_stability <- function(object){
-#   tidy_list_elements(object$stability$stability_under_model_selection)
-# }
-#
-# summary_numerical_stability <- function(object){
-#   broom::tidy(object$stability$numerical_stability)
-# }
-#
-# summary_analytic_and_algebraic_stability <- function(object){
-#   object$stability$analytic_and_algebraic_stability
-# }
-#
-# summary_technique_stability <- function(object){
-#   tidy_list_elements(object$stability$stability_under_selection_of_technique)
-# }
