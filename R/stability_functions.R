@@ -13,11 +13,7 @@ replication_stability <- function(model, data, formula, new_data = NULL, nboot =
     boot_models <- lapply(1:nboot, function(x) boot_func(...))
   }
 
-  out = list(new_model = new_model, boot_models = boot_models)
-
-  class(out) <- "rep_stab"
-
-  return(out)
+  list(new_model = new_model, boot_models = boot_models)
 }
 
 statistical_stability <- function(model, data, formula, ...) {
@@ -32,11 +28,8 @@ statistical_stability <- function(model, data, formula, ...) {
   permuted_noisy_data[[response_variable]] <- permuted_noisy_data[[response_variable]] + permuted_noise
   permuted_noisy_model <- stats::lm(formula, data = permuted_noisy_data, ...)
 
-  out = list(noisy_model = noisy_model, permuted_noisy_model = permuted_noisy_model)
+  list(noisy_model = noisy_model, permuted_noisy_model = permuted_noisy_model)
 
-  class(out) <- "stat_stab"
-
-  return(out)
 }
 
 stability_under_data_selection <- function(model, data, formula, ...) {
@@ -46,11 +39,7 @@ stability_under_data_selection <- function(model, data, formula, ...) {
   no_outlier_data <- data[-which(robustbase::covMcd(data)$mah > stats::qchisq(0.975, ncol(data))), ]
   no_outlier_model <- stats::lm(formula, data = no_outlier_data, ...)
 
-  out <- list(bootstrap_model = bootstrap_model, no_outlier_model = no_outlier_model)
-
-  class(out) <- "dsel_stab"
-
-  return(out)
+  list(bootstrap_model = bootstrap_model, no_outlier_model = no_outlier_model)
 }
 
 stability_under_model_selection <- function(model, data, formula, variable_to_remove = NULL, variable_of_interest = NULL, ...) {
@@ -72,38 +61,19 @@ stability_under_model_selection <- function(model, data, formula, variable_to_re
     remove_least_useful <- lmtest::lrtest(full_model, new_model)
   }
 
-  out <- list(toggle_intercept = toggle_intercept, remove_variable = remove_variable, remove_least_useful = remove_least_useful)
-
-  class(out) <- "msel_stab"
-
-  return(out)
+  list(toggle_intercept = toggle_intercept, remove_variable = remove_variable, remove_least_useful = remove_least_useful)
 }
 
 numerical_stability <- function(model, data, formula, ...) {
-  out <- stats::lm(formula, data = data + stats::rnorm(prod(dim(data))) * .Machine$double.eps^0.5, ...)
-
-  class(out) <- "num_stab"
-
-  return(out)
+  stats::lm(formula, data = data + stats::rnorm(prod(dim(data))) * .Machine$double.eps^0.5, ...)
 }
 
 analytic_and_algebraic_stability <- function(model, ...) {
   kappa <- kappa(model)
   if (kappa > 30) warning("Severe multicollinearity detected")
-
-  out <- kappa
-
-  class(out) <- "aa_stab"
-
-  return(out)
+  return(kappa)
 }
 
 stability_under_selection_of_technique <- function(model, data, formula, ...) {
   robust_regression = MASS::rlm(formula, data = data, ...)
-
-  out <- robust_regression
-
-  class(out) <- "tsel_stab"
-
-  return(out)
 }
