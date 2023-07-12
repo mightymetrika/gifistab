@@ -9,6 +9,11 @@ summary_statistical_stability <- function(obj){
 }
 
 summary_data_selection_stability <- function(obj){
+  obj <- list(bootstrap_model = obj[["bootstrap_model"]],
+              no_outlier_model = obj[["no_outlier_model"]],
+              strata_boot_model1 = obj[["strata_boot_models"]][[1]],
+              strata_boot_model2 = obj[["strata_boot_models"]][[2]],
+              strata_boot_model3 = obj[["strata_boot_models"]][[3]])
   tidy_list_elements(obj)
 }
 

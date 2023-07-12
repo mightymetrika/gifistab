@@ -2,20 +2,20 @@
 % Please edit documentation in R/stab_explainer.R
 \name{stab_explainer.gstab_glm}
 \alias{stab_explainer.gstab_glm}
-\title{Stability Explainer for Linear Models}
+\title{Stability Explainer for Generalized Linear Models}
 \usage{
 \method{stab_explainer}{gstab_glm}(object)
 }
 \arguments{
-\item{object}{A \code{gstab_lm} object.}
+\item{object}{A \code{gstab_glm} object.}
 }
 \value{
 A list of explanations and interpretations for each type of stability
-danalysis for linear models.
+analysis for generalized linear models.
 }
 \description{
 Provides explanations and interpretations for each type of stability analysis
-for linear models.
+for generalized linear models.
 }
 \examples{
 # To be provided...
