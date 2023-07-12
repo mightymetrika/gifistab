@@ -16,13 +16,17 @@
 \arguments{
 \item{model}{An object of class "lm": a fitted linear model.}
 
-\item{new_data}{An optional data frame in which to look for variables with which to predict. If omitted, the fitted values are used.}
+\item{new_data}{An optional data frame in which to look for variables with which
+to predict. If omitted, the fitted values are used.}
 
-\item{nboot}{Number of bootstrap resamples to perform in the replication stability test. If NULL (default), no resampling is done.}
+\item{nboot}{Number of bootstrap resamples to perform in the replication
+stability test. If NULL (default), no resampling is done.}
 
-\item{variable_to_remove}{Variable to remove for the stability under model selection test. If NULL (default), no variable is removed.}
+\item{variable_to_remove}{Variable to remove for the stability under model
+selection test. If NULL (default), no variable is removed.}
 
-\item{variable_of_interest}{Variable to consider for backward selection in the stability under model selection test. If NULL (default), no variable is considered.}
+\item{variable_of_interest}{Variable to consider for backward selection in the
+stability under model selection test. If NULL (default), no variable is considered.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
@@ -30,7 +34,13 @@
 A list with the original model and the results of each stability check.
 }
 \description{
-This function performs a stability analysis on a linear model (of class 'lm'), checking for different types of stabilities as defined by Michailides and de Leeuw (1998). The stability tests include replication stability, statistical stability, stability under data selection, stability under model selection, numerical stability, analytic and algebraic stability, and stability under selection of technique. The output is a list with the original model and the results of each stability check.
+This function performs a stability analysis on a linear model (of class 'lm'),
+checking for different types of stabilities as defined by Michailides and de
+Leeuw (1998). The stability tests include replication stability, statistical
+stability, stability under data selection, stability under model selection,
+numerical stability, analytic and algebraic stability, and stability under
+selection of technique. The output is a list with the original model and the
+results of each stability check.
 }
 \examples{
 # Generating example data
@@ -48,5 +58,7 @@ model <- stats::lm(formula, data = data)
 gstab(model = model, nboot = 100)
 }
 \references{
-Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. https://escholarship.org/uc/item/0789f7d3
+Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate
+analysis. eScholarship, University of California, Los Angeles.
+https://escholarship.org/uc/item/0789f7d3
 }

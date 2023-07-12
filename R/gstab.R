@@ -21,18 +21,30 @@ gstab <- function(model, ...) {
 
 #' Stability Analysis for Linear Models
 #'
-#' This function performs a stability analysis on a linear model (of class 'lm'), checking for different types of stabilities as defined by Michailides and de Leeuw (1998). The stability tests include replication stability, statistical stability, stability under data selection, stability under model selection, numerical stability, analytic and algebraic stability, and stability under selection of technique. The output is a list with the original model and the results of each stability check.
+#' This function performs a stability analysis on a linear model (of class 'lm'),
+#' checking for different types of stabilities as defined by Michailides and de
+#' Leeuw (1998). The stability tests include replication stability, statistical
+#' stability, stability under data selection, stability under model selection,
+#' numerical stability, analytic and algebraic stability, and stability under
+#' selection of technique. The output is a list with the original model and the
+#' results of each stability check.
 #'
 #' @param model An object of class "lm": a fitted linear model.
-#' @param new_data An optional data frame in which to look for variables with which to predict. If omitted, the fitted values are used.
-#' @param nboot Number of bootstrap resamples to perform in the replication stability test. If NULL (default), no resampling is done.
-#' @param variable_to_remove Variable to remove for the stability under model selection test. If NULL (default), no variable is removed.
-#' @param variable_of_interest Variable to consider for backward selection in the stability under model selection test. If NULL (default), no variable is considered.
+#' @param new_data An optional data frame in which to look for variables with which
+#' to predict. If omitted, the fitted values are used.
+#' @param nboot Number of bootstrap resamples to perform in the replication
+#' stability test. If NULL (default), no resampling is done.
+#' @param variable_to_remove Variable to remove for the stability under model
+#' selection test. If NULL (default), no variable is removed.
+#' @param variable_of_interest Variable to consider for backward selection in the
+#' stability under model selection test. If NULL (default), no variable is considered.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A list with the original model and the results of each stability check.
 #' @references
-#' Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. https://escholarship.org/uc/item/0789f7d3
+#' Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate
+#' analysis. eScholarship, University of California, Los Angeles.
+#' https://escholarship.org/uc/item/0789f7d3
 #' @export
 #' @examples
 #' # Generating example data
@@ -48,13 +60,14 @@ gstab <- function(model, ...) {
 #'
 #' # Performing stability analysis
 #' gstab(model = model, nboot = 100)
-gstab.lm <- function(model, new_data = NULL, nboot = NULL, variable_to_remove = NULL, variable_of_interest = NULL, ...) {
+gstab.lm <- function(model, new_data = NULL, nboot = NULL,
+                     variable_to_remove = NULL,
+                     variable_of_interest = NULL, ...) {
 
   # Extract data and formula from the model
   data <- model$model
   terms <- labels(stats::terms(model))
   formula <- stats::as.formula(paste(terms[[1]], "~", paste(terms[-1], collapse = " + ")))
-
 
   # Apply each type of stability
   replication_stability_results <- replication_stability(model, data, formula, new_data, nboot, ...)
@@ -82,13 +95,23 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL, variable_to_remove = 
 
 #' Stability Analysis for Generalized Linear Models
 #'
-#' This function performs a stability analysis on a generalized linear model (of class 'glm'), checking for different types of stabilities as defined by Michailides and de Leeuw (1998). The stability tests include replication stability, statistical stability, stability under data selection, stability under model selection, numerical stability, analytic and algebraic stability, and stability under selection of technique. The output is a list with the original model and the results of each stability check.
+#' This function performs a stability analysis on a generalized linear model
+#' (of class 'glm'), checking for different types of stabilities as defined by
+#' Michailides and de Leeuw (1998). The stability tests include replication
+#' stability, statistical stability, stability under data selection, stability
+#' under model selection, numerical stability, analytic and algebraic stability,
+#' and stability under selection of technique. The output is a list with the
+#' original model and the results of each stability check.
 #'
 #' @param model An object of class "glm": a fitted generalized linear model.
-#' @param new_data An optional data frame in which to look for variables with which to predict. If omitted, the fitted values are used.
-#' @param nboot Number of bootstrap resamples to perform in the replication stability test. If NULL (default), no resampling is done.
-#' @param variable_to_remove Variable to remove for the stability under model selection test. If NULL (default), no variable is removed.
-#' @param variable_of_interest Variable to consider for backward selection in the stability under model selection test. If NULL (default), no variable is considered.
+#' @param new_data An optional data frame in which to look for variables with
+#' which to predict. If omitted, the fitted values are used.
+#' @param nboot Number of bootstrap resamples to perform in the replication
+#' stability test. If NULL (default), no resampling is done.
+#' @param variable_to_remove Variable to remove for the stability under model
+#' selection test. If NULL (default), no variable is removed.
+#' @param variable_of_interest Variable to consider for backward selection in the
+#' stability under model selection test. If NULL (default), no variable is considered.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A list with the original model and the results of each stability check.
@@ -109,12 +132,13 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL, variable_to_remove = 
 #'
 #' # Performing stability analysis
 #' gstab(model = model, nboot = 100)
-gstab.glm <- function(model, new_data = NULL, nboot = NULL, variable_to_remove = NULL, variable_of_interest = NULL, ...) {
+gstab.glm <- function(model, new_data = NULL, nboot = NULL,
+                      variable_to_remove = NULL,
+                      variable_of_interest = NULL, ...) {
 
   # Extract data and formula from the model
   data <- model$model
   formula <- model$formula
-
 
   # Apply each type of stability
   replication_stability_results <- replication_stability(model, data, formula, new_data, nboot, ...)
@@ -139,4 +163,3 @@ gstab.glm <- function(model, new_data = NULL, nboot = NULL, variable_to_remove =
   class(out) <- c("gstab_glm", "gstab")
   return(out)
 }
-
