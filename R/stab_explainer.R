@@ -1,7 +1,40 @@
-stab_explainer <- function(object, ...) {
+#' Stability Explainer
+#'
+#' Provides explanations and interpretations for each type of stability analysis.
+#'
+#' @param object A `gstab` object.
+#'
+#' @return A list of explanations and interpretations for each type of stability
+#' analysis.
+#' @export
+#'
+#' @seealso
+#'   \code{\link[base]{UseMethod}}
+#'
+#' @examples
+#' # To be provided...
+#'
+stab_explainer <- function(object) {
   UseMethod("stab_explainer")
 }
 
+#' Stability Explainer for Linear Models
+#'
+#' Provides explanations and interpretations for each type of stability analysis
+#' for linear models.
+#'
+#' @param object A `gstab_lm` object.
+#'
+#' @return A list of explanations and interpretations for each type of stability
+#' analysis for linear models.
+#' @export
+#'
+#' @seealso
+#'   \code{\link[base]{UseMethod}}
+#'
+#' @examples
+#' # To be provided...
+#'
 stab_explainer.gstab_lm <- function(object) {
 
   stability_definitions <- list(
@@ -46,7 +79,23 @@ stab_explainer.gstab_lm <- function(object) {
   return(stability_definitions)
 }
 
-
+#' Stability Explainer for Linear Models
+#'
+#' Provides explanations and interpretations for each type of stability analysis
+#' for linear models.
+#'
+#' @param object A `gstab_lm` object.
+#'
+#' @return A list of explanations and interpretations for each type of stability
+#' danalysis for linear models.
+#' @export
+#'
+#' @seealso
+#'   \code{\link[base]{UseMethod}}
+#'
+#' @examples
+#' # To be provided...
+#'
 stab_explainer.gstab_glm <- function(object) {
 
   stability_definitions <- list(
