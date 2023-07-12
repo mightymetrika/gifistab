@@ -97,32 +97,24 @@ numerical_stability <- function(model, data, formula, ...) {
   fit_model(formula, data = data + stats::rnorm(prod(dim(data))) * .Machine$double.eps^0.5, ...)
 }
 
-
 analytic_and_algebraic_stability <- function(model, ...) {
   kappa <- kappa(model)
   if (kappa > 30) warning("Severe multicollinearity detected")
   return(kappa)
 }
 
-# stability_under_selection_of_technique <- function(model, data, formula, ...) {
-#   if ("lm" %in% class(model)[[1]]) {
-#     robust_regression = MASS::rlm(formula, data = data, ...)
-#   } else {
-#     # Here, one could use some robust alternative to GLMs. I'll leave it as NULL for now.
-#     robust_regression = NULL
-#   }
-#   robust_regression
-# }
-
 stability_under_selection_of_technique <- function(model, data, formula, ...) {
-  if ("lm" %in% class(model)[[1]]) {
-    robust_regression = robustbase::lmrob(formula, data = data, ...)
-  } else if ("glm" %in% class(model)[[1]]) {
-    #robust_regression = robustbase::glmrob(formula, data = data, ...)
-    robust_regression <- NULL
-  } else {
-    # Here, one could use some robust alternative for other types of models. I'll leave it as NULL for now.
-    robust_regression = NULL
-  }
+  robust_regression <- NULL
+
+  tryCatch({
+    if ("lm" %in% class(model)[[1]]) {
+      robust_regression = robustbase::lmrob(formula, data = data, ...)
+    } else if ("glm" %in% class(model)[[1]]) {
+      robust_regression = robustbase::glmrob(formula, data = data, ...)
+    }
+  }, error = function(e) {
+    message("Error in fitting robust regression: ", e$message)
+  })
+
   robust_regression
 }
