@@ -66,7 +66,16 @@ stability_under_data_selection <- function(model, data, formula, ...) {
     }
   })
 
-  list(bootstrap_model = bootstrap_model, no_outlier_model = no_outlier_model)
+  strata <- sample(rep(1:3, nrow(data) / 3))
+  strata_boot_models <- lapply(1:3, function(x) {
+    data_subset <- data[strata == x, ]
+    boot_subset <- data_subset[sample(nrow(data_subset), nrow(data), replace = TRUE), ]
+    fit_model(formula, data = boot_subset, ...)
+  })
+
+  list(bootstrap_model = bootstrap_model,
+       no_outlier_model = no_outlier_model,
+       strata_boot_models = strata_boot_models)
 }
 
 stability_under_model_selection <- function(model, data, formula, variable_to_remove = NULL, variable_of_interest = NULL, ...) {

@@ -66,8 +66,7 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL,
 
   # Extract data and formula from the model
   data <- model$model
-  terms <- labels(stats::terms(model))
-  formula <- stats::as.formula(paste(terms[[1]], "~", paste(terms[-1], collapse = " + ")))
+  formula <- stats::formula(model)
 
   # Apply each type of stability
   replication_stability_results <- replication_stability(model, data, formula, new_data, nboot, ...)
@@ -138,7 +137,7 @@ gstab.glm <- function(model, new_data = NULL, nboot = NULL,
 
   # Extract data and formula from the model
   data <- model$model
-  formula <- model$formula
+  formula <- stats::formula(model)
 
   # Apply each type of stability
   replication_stability_results <- replication_stability(model, data, formula, new_data, nboot, ...)
