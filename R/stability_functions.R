@@ -93,10 +93,25 @@ stability_under_model_selection <- function(model, data, formula, variable_to_re
 
   remove_least_useful <- NULL
   if (!is.null(variable_of_interest)) {
-    full_model <- fit_model(stats::as.formula(paste(variable_of_interest, "~ .")), data = data)
-    new_model <- MASS::stepAIC(full_model, direction = "backward")
+    # Get the original dependent variable
+    dependent_var <- all.vars(formula)[1]
+
+    # Make sure variable_of_interest is in the model
+    predictors <- unique(c(all.vars(formula)[-1], variable_of_interest))
+
+    # Create a new formula
+    new_formula <- stats::as.formula(paste(dependent_var, "~", paste(predictors, collapse = " + ")))
+
+    # Fit the full model with variable_of_interest included
+    full_model <- fit_model(new_formula, data = data)
+
+    # Perform backward selection, but keep variable_of_interest in the model
+    new_model <- MASS::stepAIC(full_model, direction = "backward", scope = list(lower = new_formula, upper = new_formula))
+
+    # Perform likelihood ratio test
     remove_least_useful <- if ("lm" %in% class(model)[[1]]) lmtest::lrtest(full_model, new_model) else NULL
   }
+
 
   list(toggle_intercept = toggle_intercept, remove_variable = remove_variable, remove_least_useful = remove_least_useful)
 }

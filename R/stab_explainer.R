@@ -65,28 +65,54 @@ stab_explainer.gstab_lm <- function(object) {
     ),
     "Stability under Data Selection" = list(
       definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis. The former corresponds to rejection of outliers and resampling techniques. In this framework, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new data set (Michailides and de Leeuw, 1998).",
-      explanation = "The function fits models on resampled data and on data with outliers removed. This helps in assessing the impact of outliers and sampling variability on the model.",
-      interpretation = "Compare the model results with the resampled and no-outlier models. Significant differences may suggest instability under data selection."
+      explanation = "The stability under data selection function in the 'gifistab' package implements this definition by fitting the original model on three sets of data:
+
+      Resampled data, which is created by sampling the original data with replacement. This ensures that the resampled data has the same sample size as the original data and that the samples are drawn from the same population, but the observations are not necessarily the same.
+
+      Data with outliers removed, which is created by using robust multivariate Mahalanobis distances; if outlier identification using  robust multivariate Mahalanobis distances fails, then observations will be identified as outliers if the observation is 3 standard deviations away from the mean on any of the variables in the data. Outliers are removed from the data and the model is refitted.
+
+      Stratified bootstrap data, which is created by first creating three random subsamples of the data where each observation belongs to one and only one subsample.  Subsamples are then used to create bootstrap samples of the same sample size as the original data. This ensures that the bootstrap samples are representative of the distribution of the data in the original data set.",
+      interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with resampled data, with outliers removed, and with stratified bootstrap data, then the model is considered to be stable under data selection. However, if there are significant differences between the original model and the models fitted with resampled data, with outliers removed, or with stratified bootstrap data, then the model may not be stable under data selection.
+
+      In general, a model with good stability under data selection is less likely to be affected by outliers or sampling variability."
     ),
     "Stability under Model Selection" = list(
       definition = "Small changes in the model should result in small changes in the results obtained (Michailides and de Leeuw, 1998).",
-      explanation = "The function tests models with changes in the intercept and removal of a variable. It also attempts backward selection if a variable of interest is specified. This helps in assessing the stability of the model under small changes in model specification.",
-      interpretation = "Look at the likelihood ratio tests between the original model and the models with modified specifications. Significant differences may indicate instability under model selection."
+      explanation = "The stability under model selection function in the 'gifistab' package implements this definition by assessing the stability of a model to three types of changes:
+
+      Toggling the intercept: This involves removing the intercept from a model that includes the intercept or adding the intercept from a model that excludes the intercept. After toggling the intercept the model is refit. If the results of the two models are similar, then the model is considered to be stable to changes in the intercept.
+
+      Removing a variable: This involves removing a user selected variable from the model and then re-fitting the model. If the results of the two models are similar, then the model is considered to be stable with or without controlling for the user selected variable.
+
+      Removing the least useful variable: This involves selecting a variable of interest fitting a full model with all of the variables and then using a backward stepwise selection procedure to remove the least useful variable that is not the variable of interest. If the results of the two models are similar, then the model is considered to be stable to changes in the least useful variable.",
+      interpretation = "The results of the stability under model selection function can be used to assess the robustness of a model to changes in the model specification. If the results of the function show that the model is stable to changes in the intercept, the user selected variable to remove, and the least useful variable, then the model is considered to be robust. However, if the results of the function show that the model is not stable to changes in the model specification, then the model may be sensitive to changes in the data and may not be a reliable predictor. While this stability assessment is designed for the situation where the user wishes to make inferences on a variable of interest after controlling for other variables in the model, it may also provide useful stability information for situations where the user wishes to interpret multiple coefficients."
     ),
     "Numerical Stability" = list(
       definition = "It refers to the influence of rounding errors and of computation with limited precision on the results given by the techniques (Michailides and de Leeuw, 1998).",
-      explanation = "The function fits the model on data that's been perturbed by a small amount of random noise. This assesses the impact of rounding errors and limited precision computations on the model.",
-      interpretation = "Compare the coefficients, standard errors and p-values between the original model and the model with perturbed data. Large differences could suggest numerical instability."
+      explanation = "The numerical stability function in the 'gifistab' package implements this definition by fitting the model on data that has been perturbed by a small amount of random noise. This assesses the impact of rounding errors and limited precision computations on the model.
+
+      The function works by first fitting the model on the original data. Then, it perturbs the data by adding a small amount of normally distributed random noise. The amount of noise is specified by the .Machine$double.eps^0.5 argument. This argument is the square root of the machine epsilon, which is the smallest positive number that can be added to 1 without changing the value of 1.
+
+      Once the data has been perturbed, the function fits the model again. The results of the two fits are then compared. If the results are similar, then the model is considered to be numerically stable. However, if the results are different, then the model may be numerically unstable.",
+      interpretation = "The results of the numerical stability function can be used to assess the robustness of a model to rounding errors and limited precision computations. If the results of the function show that the model is numerically stable, then the model is considered to be robust. However, if the results of the function show that the model is not numerically stable, then the model may be sensitive to rounding errors and may not be a reliable predictor."
     ),
     "Analytic and Algebraic Stability" = list(
       definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
-      explanation = "The function calculates the condition number (kappa) of the original model, which is a measure of multicollinearity. High multicollinearity can make the model unstable under slight changes in the input.",
-      interpretation = "If the kappa value is above 30, there's severe multicollinearity, which may lead to instability in the model."
+      explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
+
+      The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
+
+      A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
+      interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
     ),
     "Stability under Selection of Technique" = list(
       definition = "Application of a number of different techniques to the same data set, aiming at answering the same question, results in approximately the same information (Michailides and de Leeuw, 1998).",
-      explanation = "The function fits a robust linear regression model using the same specification as the original model. This helps in assessing the stability of the model under different fitting techniques.",
-      interpretation = "Compare the coefficients, standard errors and p-values of the original model with those of the robust model. Significant differences might indicate a lack of stability under selection of technique."
+      explanation = "The stability under selection of technique function in the 'gifistab' package implements this definition by fitting a robust regression model using the same specification as the original model. This helps in assessing the stability of the model under different fitting techniques.
+
+      The function works by first fitting the original model. Then, it fits a robust regression model using the same specification as the original model. The robust regression model is fitted using the 'lmrob' function from the 'robustbase' R package.
+
+      The results of the two models are then compared. If the results are similar, then the model is considered to be stable under different fitting techniques. However, if the results are different, then the model may be unstable under different fitting techniques.",
+      interpretation = "The results of the stability under selection of technique function can be used to assess the robustness of a model to different fitting techniques. If the results of the two models are similar, then the model is considered to be robust. However, if the results of the two models are different, then the model may be unstable under different fitting techniques."
     )
   )
 
@@ -140,28 +166,48 @@ stab_explainer.gstab_glm <- function(object) {
     ),
     "Stability under Data Selection" = list(
       definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis (Michailides and de Leeuw, 1998).",
-      explanation = "The function fits models on resampled data and on data with outliers removed. This helps in assessing the impact of outliers and sampling variability on the model.",
-      interpretation = "Compare the model results with the resampled and no-outlier models. Significant differences may suggest instability under data selection."
+      explanation = "The stability under data selection function in the 'gifistab' package implements this definition by fitting the original model on three sets of data:
+
+      Resampled data, which is created by sampling the original data with replacement. This ensures that the resampled data has the same sample size as the original data and that the samples are drawn from the same population, but the observations are not necessarily the same.
+
+      Data with outliers removed, which is created by using robust multivariate Mahalanobis distances; if outlier identification using  robust multivariate Mahalanobis distances fails, then observations will be identified as outliers if the observation is 3 standard deviations away from the mean on any of the variables in the data. Outliers are removed from the data and the model is refitted.
+
+      Stratified bootstrap data, which is created by first creating three random subsamples of the data where each observation belongs to one and only one subsample.  Subsamples are then used to create bootstrap samples of the same sample size as the original data. This ensures that the bootstrap samples are representative of the distribution of the data in the original data set.",
+      interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with resampled data, with outliers removed, and with stratified bootstrap data, then the model is considered to be stable under data selection. However, if there are significant differences between the original model and the models fitted with resampled data, with outliers removed, or with stratified bootstrap data, then the model may not be stable under data selection.
+
+      In general, a model with good stability under data selection is less likely to be affected by outliers or sampling variability."
     ),
     "Stability under Model Selection" = list(
       definition = "Small changes in the model should result in small changes in the results obtained (Michailides and de Leeuw, 1998).",
-      explanation = "The function tests models with changes in the intercept and removal of a variable. It also attempts backward selection if a variable of interest is specified. This helps in assessing the stability of the model under small changes in model specification.",
-      interpretation = "Look at the likelihood ratio tests between the original model and the models with modified specifications. Significant differences may indicate instability under model selection."
+      explanation = "Not currently implemented for stats::glm engine.",
+      interpretation = "Not currently implemented for stats::glm engine."
     ),
     "Numerical Stability" = list(
       definition = "It refers to the influence of rounding errors and of computation with limited precision on the results given by the techniques (Michailides and de Leeuw, 1998).",
-      explanation = "The function fits the model on data that's been perturbed by a small amount of random noise. This assesses the impact of rounding errors and limited precision computations on the model.",
-      interpretation = "Compare the coefficients, standard errors and p-values between the original model and the model with perturbed data. Large differences could suggest numerical instability."
+      explanation = "The numerical stability function in the 'gifistab' package implements this definition by fitting the model on data that has been perturbed by a small amount of random noise. This assesses the impact of rounding errors and limited precision computations on the model.
+
+      The function works by first fitting the model on the original data. Then, it perturbs the data by adding a small amount of normally distributed random noise. The amount of noise is specified by the .Machine$double.eps^0.5 argument. This argument is the square root of the machine epsilon, which is the smallest positive number that can be added to 1 without changing the value of 1.
+
+      Once the data has been perturbed, the function fits the model again. The results of the two fits are then compared. If the results are similar, then the model is considered to be numerically stable. However, if the results are different, then the model may be numerically unstable.",
+      interpretation = "The results of the numerical stability function can be used to assess the robustness of a model to rounding errors and limited precision computations. If the results of the function show that the model is numerically stable, then the model is considered to be robust. However, if the results of the function show that the model is not numerically stable, then the model may be sensitive to rounding errors and may not be a reliable predictor."
     ),
     "Analytic and Algebraic Stability" = list(
       definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
-      explanation = "The function calculates the condition number (kappa) of the original model, which is a measure of multicollinearity. High multicollinearity can make the model unstable under slight changes in the input.",
-      interpretation = "If the kappa value is above 30, there's severe multicollinearity, which may lead to instability in the model."
+      explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
+
+      The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
+
+      A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
+      interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
     ),
     "Stability under Selection of Technique" = list(
       definition = "Application of a number of different techniques to the same data set, aiming at answering the same question, results in approximately the same information (Michailides and de Leeuw, 1998).",
-      explanation = "For linear models, the function fits a robust linear regression model using the same specification as the original model. For generalized linear models, a robust alternative would be used if available. This helps in assessing the stability of the model under different fitting techniques.",
-      interpretation = "Compare the coefficients, standard errors and p-values of the original model with those of the robust model. Significant differences might indicate a lack of stability under selection of technique."
+      explanation = "The stability under selection of technique function in the 'gifistab' package implements this definition by fitting a robust regression model using the same specification as the original model. This helps in assessing the stability of the model under different fitting techniques.
+
+      The function works by first fitting the original model. Then, it fits a robust regression model using the same specification as the original model. The robust regression model is fitted using the 'glmrob' function from the 'robustbase' R package.
+
+      The results of the two models are then compared. If the results are similar, then the model is considered to be stable under different fitting techniques. However, if the results are different, then the model may be unstable under different fitting techniques.",
+      interpretation = "The results of the stability under selection of technique function can be used to assess the robustness of a model to different fitting techniques. If the results of the two models are similar, then the model is considered to be robust. However, if the results of the two models are different, then the model may be unstable under different fitting techniques."
     )
   )
 
