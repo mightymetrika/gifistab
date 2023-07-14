@@ -4,10 +4,16 @@
 \alias{summary.gstab_glm}
 \title{Summary for Stability Analysis for Generalized Linear Models}
 \usage{
-\method{summary}{gstab_glm}(object, ...)
+\method{summary}{gstab_glm}(object, conf.int, conf.level, ...)
 }
 \arguments{
 \item{object}{An object of class "gstab_glm", usually, a result of a call to gstab.glm.}
+
+\item{conf.int}{Logical variable. If TRUE, include a confidence interval in
+the summary.}
+
+\item{conf.level}{Confidence level for confidence interval when conf.int is
+TRUE.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
@@ -16,4 +22,20 @@ A list with the summary of the original model and the summaries of each stabilit
 }
 \description{
 This function produces a summary of the stability analysis for a generalized linear model.
+}
+\examples{
+  # Generating example data
+n <- 20
+set.seed(376)
+data <- data.frame(y = stats::rbinom(n, 1, 0.5),
+                   x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
+                   x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
+formula <- y ~ x1 + x2
+
+# Fit the model
+model <- stats::glm(formula, family = binomial, data = data)
+
+#Test with nboot
+stab_res <- suppressWarnings(gstab(model = model, nboot = 100))
+stab_sum <- summary(stab_res, conf.int = FALSE)
 }

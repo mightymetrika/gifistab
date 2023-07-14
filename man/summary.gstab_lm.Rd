@@ -4,10 +4,16 @@
 \alias{summary.gstab_lm}
 \title{Summary of Stability Analysis for Linear Models}
 \usage{
-\method{summary}{gstab_lm}(object, ...)
+\method{summary}{gstab_lm}(object, conf.int, conf.level, ...)
 }
 \arguments{
 \item{object}{An object of class 'gstab_lm'.}
+
+\item{conf.int}{Logical variable. If TRUE, include a confidence interval in
+the summary.}
+
+\item{conf.level}{Confidence level for confidence interval when conf.int is
+TRUE.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
@@ -29,7 +35,7 @@ formula <- y ~ x1 + x2
 model <- stats::lm(formula, data = data)
 
 stab_res <- gstab(model = model, nboot = 100)
-summary(stab_res)
+summary(stab_res, conf.int = TRUE, conf.level = 0.95)
 }
 \seealso{
 \code{\link{gstab}} for performing the stability analysis,
