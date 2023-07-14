@@ -41,42 +41,6 @@ tidy_list_elements <- function(list_elements, conf.int, conf.level) {
 }
 
 # Function to handle the boot model summaries
-# handle_boot_model_summaries <- function(boot_models) {
-#   if (is.null(boot_models)) {
-#     return(list(boot_mean = NULL, boot_sd = NULL))
-#   }
-#
-#   boot_model_summaries <- lapply(boot_models, broom::tidy)
-#   boot_stats <- lapply(boot_model_summaries, function(model_summary){
-#     data.frame(
-#       term = model_summary$term,
-#       estimate = model_summary$estimate,
-#       std_error = model_summary$std.error,
-#       p_value = model_summary$p.value
-#     )
-#   })
-#
-#   boot_stats_df <- dplyr::bind_rows(boot_stats)
-#
-#   boot_mean_df <- boot_stats_df |>
-#     dplyr::group_by(term) |>
-#     dplyr::summarise(
-#       estimate = mean(estimate, na.rm = TRUE),
-#       std.error = mean(std_error, na.rm = TRUE),
-#       prop_sig = mean(p_value < 0.05, na.rm = TRUE)
-#     )
-#
-#   boot_sd_df <- boot_stats_df |>
-#     dplyr::group_by(term) |>
-#     dplyr::summarise(
-#       estimate = stats::sd(estimate, na.rm = TRUE),
-#       std.error = stats::sd(std_error, na.rm = TRUE)
-#     )
-#
-#   return(list(boot_mean = boot_mean_df, boot_sd = boot_sd_df))
-# }
-
-# Function to handle the boot model summaries
 handle_boot_model_summaries <- function(boot_models, conf.int, conf.level) {
   if (is.null(boot_models)) {
     return(list(boot_mean = NULL, boot_sd = NULL))
@@ -106,7 +70,7 @@ handle_boot_model_summaries <- function(boot_models, conf.int, conf.level) {
 
   if (conf.int){
     boot_mean_df <- boot_mean_df |>
-      dplyr::select(estimate, std.error, prop_sig, conf.low, conf.high)
+      dplyr::select(term, estimate, std.error, prop_sig, conf.low, conf.high)
   }
 
   boot_sd_df <- boot_stats_df |>
