@@ -20,6 +20,10 @@
 #' to be removed for stability under model selection assessment.
 #' @param variable_of_interest An optional character string specifying a variable
 #' of interest for backward selection in stability under model selection assessment.
+#' @param conf.int Logical variable. If TRUE, include a confidence interval in
+#' the summary. Defaults to TRUE.
+#' @param conf.level Confidence level for confidence interval when conf.int is
+#' TRUE. Defaults to 0.95.
 #' @param ... Additional arguments to be passed to the `engine` function.
 #'
 #' @return A list containing the results of the stability assessment. The list
@@ -37,7 +41,10 @@
 #' @seealso
 #'   \code{\link[base]{do.call}}
 #'
-stability_assessment <- function(data, formula, engine, new_data = NULL, nboot = NULL, variable_to_remove = NULL, variable_of_interest = NULL, ...) {
+stability_assessment <- function(data, formula, engine, new_data = NULL,
+                                 nboot = NULL, variable_to_remove = NULL,
+                                 variable_of_interest = NULL,
+                                 conf.int = TRUE, conf.level = 0.95, ...) {
   # Fit the model using the specified engine and arguments
   fit_model <- do.call(engine, c(list(formula, data = data), list(...)))
 
@@ -45,7 +52,7 @@ stability_assessment <- function(data, formula, engine, new_data = NULL, nboot =
   gstab_result <- gstab(fit_model, new_data = new_data, nboot = nboot, variable_to_remove = variable_to_remove, variable_of_interest = variable_of_interest, ...)
 
   # Generate summary of stability assessment
-  gstab_summary_result <- summary(gstab_result)
+  gstab_summary_result <- summary(gstab_result, conf.int, conf.level)
 
   # Generate explanations of stability assessment
   gstab_explainer_result <- stab_explainer(gstab_result)

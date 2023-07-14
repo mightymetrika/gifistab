@@ -11,7 +11,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
 
   #Test with nboot
   stab_res <- gstab(model = model, nboot = 100)
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -24,7 +24,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
                      x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
                      x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
   stab_res <- gstab(model, new_data = new_data)
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -33,7 +33,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
 
   #Test with variable to remove
   stab_res <- gstab(model, variable_to_remove = "x2")
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -42,7 +42,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
 
   #Test with variable of interest
   stab_res <- gstab(model, variable_of_interest = "x1")
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -52,7 +52,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
   #Test with all parameters set
   stab_res <- gstab(model = model, nboot = 100, new_data = new_data,
                     variable_to_remove = "x2", variable_of_interest = "x1")
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -74,7 +74,7 @@ test_that("Test that gstab.glm works and summary.gstab_lm works", {
 
   #Test with nboot
   stab_res <- suppressWarnings(gstab(model = model, nboot = 100))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -87,7 +87,7 @@ test_that("Test that gstab.glm works and summary.gstab_lm works", {
                          x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
                          x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
   stab_res <- suppressWarnings(gstab(model, new_data = new_data))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -96,7 +96,7 @@ test_that("Test that gstab.glm works and summary.gstab_lm works", {
 
   #Test with variable to remove
   stab_res <- suppressWarnings(gstab(model, variable_to_remove = "x2"))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -105,7 +105,7 @@ test_that("Test that gstab.glm works and summary.gstab_lm works", {
 
   #Test with variable of interest
   stab_res <- suppressWarnings(gstab(model, variable_of_interest = "x1"))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -129,7 +129,7 @@ test_that("Test that gstab.glm and summary.gstab_lm work with family = poisson",
 
   #Test with nboot
   stab_res <- suppressWarnings(gstab(model = model, nboot = 100))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -142,7 +142,7 @@ test_that("Test that gstab.glm and summary.gstab_lm work with family = poisson",
                      x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
                      x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
   stab_res <- suppressWarnings(gstab(model, new_data = new_data))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -151,7 +151,7 @@ test_that("Test that gstab.glm and summary.gstab_lm work with family = poisson",
 
   #Test with variable to remove
   stab_res <- suppressWarnings(gstab(model, variable_to_remove = "x2"))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",
@@ -160,7 +160,7 @@ test_that("Test that gstab.glm and summary.gstab_lm work with family = poisson",
 
   #Test with variable of interest
   stab_res <- suppressWarnings(gstab(model, variable_of_interest = "x1"))
-  stab_sum <- summary(stab_res)
+  stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
                            "statistical_stability_summary", "data_selection_stability_summary",

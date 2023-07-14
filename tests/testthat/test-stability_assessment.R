@@ -16,7 +16,7 @@ test_that("stability_assessment works with the stats::lm engine", {
 test_that("stability_assessment works with the stats::glm engine", {
   # Generating example data
   n <- 20
-  set.seed(376)
+  set.seed(350)
   data <- data.frame(y = rbinom(n, 1, 0.5),
                      x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
                      x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
@@ -114,7 +114,7 @@ test_that("stability_assessment stats::lm engine works with interactions", {
 test_that("stability_assessment stats::glm engine works with interactions", {
   # Generating example data
   n <- 20
-  set.seed(376)
+  set.seed(320)
   data <- data.frame(y = rbinom(n, 1, 0.5),
                      x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
                      x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05),
@@ -128,6 +128,7 @@ test_that("stability_assessment stats::glm engine works with interactions", {
   rm(sa_res)
 
   # Test with bootstrap and new data
+  set.seed(320)
   new_data <- data.frame(y = stats::rpois(n, 2),
                          x1 = 3*stats::rnorm(n),
                          x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05),

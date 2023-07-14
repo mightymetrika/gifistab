@@ -12,6 +12,8 @@ stability_assessment(
   nboot = NULL,
   variable_to_remove = NULL,
   variable_of_interest = NULL,
+  conf.int = TRUE,
+  conf.level = 0.95,
   ...
 )
 }
@@ -35,6 +37,12 @@ to be removed for stability under model selection assessment.}
 
 \item{variable_of_interest}{An optional character string specifying a variable
 of interest for backward selection in stability under model selection assessment.}
+
+\item{conf.int}{Logical variable. If TRUE, include a confidence interval in
+the summary. Defaults to TRUE.}
+
+\item{conf.level}{Confidence level for confidence interval when conf.int is
+TRUE. Defaults to 0.95.}
 
 \item{...}{Additional arguments to be passed to the \code{engine} function.}
 }
