@@ -65,8 +65,6 @@ summary.gstab_lm <- function(object, conf.int, conf.level, ...) {
   )
 
   return(summary_out)
-
-
 }
 
 #' Summary for Stability Analysis for Generalized Linear Models
