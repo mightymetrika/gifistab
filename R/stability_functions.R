@@ -82,36 +82,70 @@ stability_under_model_selection <- function(model, data, formula, variable_to_re
   has_intercept <- attr(stats::terms(model), "intercept")
   fit_model <- fit_model_func(model)
   new_model <- if (has_intercept) stats::update(model, . ~ . - 1) else stats::update(model, . ~ . + 0)
-  toggle_intercept <- if ("lm" %in% class(model)[[1]]) lmtest::lrtest(model, new_model) else NULL
+  toggle_intercept <- lmtest::lrtest(model, new_model)
 
   remove_variable <- NULL
   if (!is.null(variable_to_remove)) {
-    if (!variable_to_remove %in% colnames(data)) stop("Specified variable not found in the data.")
-    new_model <- stats::update(model, stats::as.formula(paste(". ~ . -", variable_to_remove)))
-    remove_variable <- if ("lm" %in% class(model)[[1]]) lmtest::lrtest(model, new_model) else NULL
+
+    # If variable_to_remove is an interaction, just remove the interaction
+    if (grepl(":", variable_to_remove)) {
+      new_formula <- stats::as.formula(paste(". ~ . -", variable_to_remove))
+      new_model <- stats::update(model, new_formula)
+      remove_variable <- lmtest::lrtest(model, new_model)
+    } else {
+      if (!variable_to_remove %in% colnames(data)) stop("Specified variable not found in the data.")
+
+      # Extract all variables in the formula
+      all_vars <- all.vars(formula)
+
+      # Find all variables and interactions that include variable_to_remove
+      vars_to_remove <- all_vars[grepl(paste0("\\b", variable_to_remove, "\\b"), all_vars)]
+
+      # Create a new formula without those variables
+      new_formula <- stats::as.formula(paste(". ~ . -", paste(vars_to_remove, collapse = " - ")))
+
+      # Update the model
+      new_model <- stats::update(model, new_formula)
+
+      # Perform likelihood ratio test
+      remove_variable <- lmtest::lrtest(model, new_model)
+    }
   }
 
   remove_least_useful <- NULL
   if (!is.null(variable_of_interest)) {
-    # Get the original dependent variable
-    dependent_var <- all.vars(formula)[1]
 
-    # Make sure variable_of_interest is in the model
-    predictors <- unique(c(all.vars(formula)[-1], variable_of_interest))
+    if (grepl(":", variable_of_interest)) {
+      variable_of_interest <- unlist(strsplit(variable_of_interest, ":"))
+    }
 
-    # Create a new formula
-    new_formula <- stats::as.formula(paste(dependent_var, "~", paste(predictors, collapse = " + ")))
+    # Ensure variable_of_interest is in the model
+    if (!all(variable_of_interest %in% all.vars(formula))) {
+      stop(paste("One or more variables of interest", paste(variable_of_interest, collapse = ", "), "are not in the model."))
+    }
 
-    # Fit the full model with variable_of_interest included
-    full_model <- fit_model(new_formula, data = data)
+    # Expand any shorthand interactions in the formula
+    formula <- stats::reformulate(labels(stats::terms(formula)), formula[[2]])
 
-    # Perform backward selection, but keep variable_of_interest in the model
-    new_model <- MASS::stepAIC(full_model, direction = "backward", scope = list(lower = new_formula, upper = new_formula))
+    # Find all variables and interactions that include any variable in variable_of_interest
+    vars_to_keep <- all.vars(formula)[grepl(paste0("\\b(", paste(variable_of_interest, collapse = "|"), ")\\b"), all.vars(formula))]
+
+    # Find all unique variables involved in these terms
+    unique_vars <- unique(unlist(strsplit(vars_to_keep, ":|\\+")))
+
+    # The "lower" model includes the variable of interest, its interactions,
+    # and the variables involved in these interactions
+    lower_formula <- stats::as.formula(paste(formula[[2]], "~", paste(unique_vars, collapse = " + ")))
+
+    # The full model includes all variables
+    full_model <- fit_model(formula, data = data)
+
+    # Perform backward selection, but keep the lower model in the scope
+    new_model <- MASS::stepAIC(full_model, direction = "backward", scope = list(lower = lower_formula, upper = formula))
 
     # Perform likelihood ratio test
-    remove_least_useful <- if ("lm" %in% class(model)[[1]]) lmtest::lrtest(full_model, new_model) else NULL
+    remove_least_useful <- lmtest::lrtest(full_model, new_model)
   }
-
 
   list(toggle_intercept = toggle_intercept, remove_variable = remove_variable, remove_least_useful = remove_least_useful)
 }
