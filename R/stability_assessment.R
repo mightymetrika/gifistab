@@ -27,8 +27,8 @@
 #' @param ... Additional arguments to be passed to the `engine` function.
 #'
 #' @return A list containing the results of the stability assessment. The list
-#' includes the original `gstab` object, the summary of the `gstab` object, and
-#' the explanations of the `gstab` object.
+#' includes the original `gstab` object, the summary of the `gstab` object, the
+#' plots of the `gstab_sum` object, and the explanations of the `gstab` object.
 #'
 #' @references
 #' Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. \url{https://escholarship.org/uc/item/0789f7d3}
@@ -37,10 +37,6 @@
 #'
 #' @examples
 #' # To be provided...
-#'
-#' @seealso
-#'   \code{\link[base]{do.call}}
-#'
 stability_assessment <- function(data, formula, engine, new_data = NULL,
                                  nboot = NULL, variable_to_remove = NULL,
                                  variable_of_interest = NULL,
@@ -54,12 +50,16 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
   # Generate summary of stability assessment
   gstab_summary_result <- summary(gstab_result, conf.int, conf.level)
 
+  # Generate plot of stability assessment
+  gstab_plot_result<- plot(gstab_summary_result, conf.int)
+
   # Generate explanations of stability assessment
   gstab_explainer_result <- stab_explainer(gstab_result)
 
   # Return a list containing the results
   result <- list(gstab = gstab_result,
                  gstab_summary = gstab_summary_result,
+                 gstab_plot = gstab_plot_result,
                  gstab_explainer = gstab_explainer_result)
 
   return(result)
