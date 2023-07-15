@@ -1,4 +1,4 @@
-plot_replication_stability <- function(obj, conf.int, ...) {
+plot_replication_stability <- function(obj, conf.int) {
   original_estimates <- obj$original_summary
   new_estimates <- obj$replication_stability_summary$new_model
   boot_mean_estimates <- obj$replication_stability_summary$boot_models$boot_mean
@@ -17,15 +17,7 @@ plot_replication_stability <- function(obj, conf.int, ...) {
       type = c(rep("Original", n_terms_original), rep("New", n_terms_new))
     )
 
-    p_new <- ggplot2::ggplot(plot_df_new, ggplot2::aes(x = term, y = estimate, color = type)) +
-      ggplot2::geom_point() +
-      ggplot2::labs(x = "Term", y = "Estimate", color = "Type") +
-      ggplot2::theme_minimal()
-
-    if (conf.int){
-      p_new <- p_new +
-        ggplot2::geom_errorbar(ggplot2::aes(ymin = conf.low, ymax = conf.high), width = 0.2)
-    }
+    p_new <- create_plot(plot_df_new, conf.int)
   }
 
   p_boot <- NULL
@@ -38,15 +30,7 @@ plot_replication_stability <- function(obj, conf.int, ...) {
       type = c(rep("Original", n_terms_original), rep("Bootstrap Mean", n_terms_boot))
     )
 
-    p_boot <- ggplot2::ggplot(plot_df_boot, ggplot2::aes(x = term, y = estimate, color = type)) +
-      ggplot2::geom_point() +
-      ggplot2::labs(x = "Term", y = "Estimate", color = "Type") +
-      ggplot2::theme_minimal()
-
-    if (conf.int){
-      p_boot <- p_boot +
-        ggplot2::geom_errorbar(ggplot2::aes(ymin = conf.low, ymax = conf.high), width = 0.2)
-    }
+    p_boot <- create_plot(plot_df_boot, conf.int)
   }
 
   out <- list(new = p_new, boot = p_boot)
@@ -55,7 +39,7 @@ plot_replication_stability <- function(obj, conf.int, ...) {
 
 
 # Plot function for statistical stability
-plot_statistical_stability <- function(obj, conf.int, ...) {
+plot_statistical_stability <- function(obj, conf.int) {
   original_estimates <- obj$original_summary
   noisy_estimates <- obj$statistical_stability_summary$noisy_model
   permuted_noisy_estimates <- obj$statistical_stability_summary$permuted_noisy_model
@@ -74,22 +58,12 @@ plot_statistical_stability <- function(obj, conf.int, ...) {
   )
 
   # Create the plot
-  p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = term, y = estimate, color = type)) +
-    ggplot2::geom_point() +
-    ggplot2::labs(x = "Term", y = "Estimate", color = "Type") +
-    ggplot2::theme_minimal()
-
-  # Add error bars if confidence intervals are included
-  if (conf.int){
-    p <- p +
-      ggplot2::geom_errorbar(ggplot2::aes(ymin = conf.low, ymax = conf.high), width = 0.2)
-  }
-
+  p <- create_plot(plot_df, conf.int)
   return(p)
 }
 
 # Plot function for data selection stability
-plot_data_selection_stability <- function(obj, conf.int, ...) {
+plot_data_selection_stability <- function(obj, conf.int) {
   original_estimates <- obj$original_summary
   bootstrap_estimates <- obj$data_selection_stability_summary$bootstrap_model
   no_outlier_estimates <- obj$data_selection_stability_summary$no_outlier_model
@@ -150,7 +124,6 @@ plot_data_selection_stability <- function(obj, conf.int, ...) {
                                                                       rep(NA, n_terms_strata_boot1),
                                                                       rep(NA, n_terms_strata_boot2),
                                                                       rep(NA, n_terms_strata_boot3)),
-    #conf.high = if(conf.int) c(original_estimates$conf.high, strata_boot_estimates$conf.high) else c(rep(NA, n_terms_original), rep(NA, n_terms_strata_boot)),
     type = c(rep("Original", n_terms_original),
              rep("Strata 1 Bootstrap", n_terms_strata_boot1),
              rep("Strata 2 Bootstrap", n_terms_strata_boot2),
@@ -194,7 +167,7 @@ plot_model_selection_stability <- function(obj) {
   return(p)
 }
 
-plot_numerical_stability <- function(obj, conf.int = FALSE) {
+plot_numerical_stability <- function(obj, conf.int) {
 
   # Extract the summary of the numerical stability model
   original_summary <- obj$original_summary
@@ -228,7 +201,7 @@ plot_analytic_and_algebraic_stability <- function(obj) {
   return(p)
 }
 
-plot_technique_stability <- function(obj, conf.int, ...) {
+plot_technique_stability <- function(obj, conf.int) {
 
   # Extract the original and robust regression summaries
   original_estimates <- obj$original_summary
