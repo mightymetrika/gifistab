@@ -152,7 +152,17 @@ stability_under_model_selection <- function(model, data, formula, variable_to_re
 
 numerical_stability <- function(model, data, formula, ...) {
   fit_model <- fit_model_func(model)
-  fit_model(formula, data = data + stats::rnorm(prod(dim(data))) * .Machine$double.eps^0.5, ...)
+
+  # Identify numeric columns
+  num_cols <- which(sapply(data, is.numeric))
+
+  # Create a copy of the data
+  data_noisy <- data
+
+  # Add noise only to numeric columns
+  data_noisy[, num_cols] <- data[, num_cols] + stats::rnorm(length(num_cols)) * .Machine$double.eps^0.5
+
+  fit_model(formula, data = data_noisy, ...)
 }
 
 analytic_and_algebraic_stability <- function(model, ...) {

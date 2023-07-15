@@ -37,7 +37,15 @@ summary_technique_stability <- function(obj, conf.int, conf.level){
 
 # Applying broom::tidy on list elements
 tidy_list_elements <- function(list_elements, conf.int, conf.level) {
-  lapply(list_elements, broom::tidy, conf.int = conf.int, conf.level = conf.level)
+  lapply(list_elements, function(x) {
+    tryCatch(
+      broom::tidy(x, conf.int = conf.int, conf.level = conf.level),
+      error = function(e) {
+        warning("Error in broom::tidy: ", e$message)
+        NULL
+      }
+    )
+  })
 }
 
 # Function to handle the boot model summaries
