@@ -355,7 +355,7 @@ test_that("plot_technique_stability works", {
   # Fit the model
   model <- stats::glm(formula, family = poisson(link = "log"), data = data)
   stab_res <- suppressWarnings(gstab(model = model, family = poisson(link = "log")))
-  stab_sum <- summary(stab_res, conf.int = TRUE, conf.level = 0.95)
+  stab_sum <- suppressWarnings(summary(stab_res, conf.int = TRUE, conf.level = 0.95))
 
   p_conf <- plot_technique_stability(stab_sum, conf.int = TRUE)
   p_noconf <- plot_technique_stability(stab_sum, conf.int = FALSE)

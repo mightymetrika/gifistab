@@ -53,7 +53,7 @@ summary.gstab_lm <- function(object, conf.int, conf.level, ...) {
   technique_stability_summary <- summary_technique_stability(object$stability$stability_under_selection_of_technique, conf.int, conf.level)
 
   # Combining all summaries
-  summary_out <- list(
+  out <- list(
     original_summary = original_summary,
     replication_stability_summary = replication_stability_summary,
     statistical_stability_summary = statistical_stability_summary,
@@ -64,7 +64,9 @@ summary.gstab_lm <- function(object, conf.int, conf.level, ...) {
     technique_stability_summary = technique_stability_summary
   )
 
-  return(summary_out)
+  class(out) <- "gstab_sum"
+
+  return(out)
 }
 
 #' Summary for Stability Analysis for Generalized Linear Models
@@ -116,6 +118,8 @@ summary.gstab_glm <- function(object, conf.int, conf.level, ...) {
               numerical_stability_summary = numerical_stability_summary,
               analytic_and_algebraic_stability_summary = analytic_and_algebraic_stability_summary,
               technique_stability_summary = technique_stability_summary)
+
+  class(out) <- "gstab_sum"
 
   # Return output
   return(out)

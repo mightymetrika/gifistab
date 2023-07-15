@@ -2,6 +2,7 @@
 
 S3method(gstab,glm)
 S3method(gstab,lm)
+S3method(plot,gstab_sum)
 S3method(stab_explainer,gstab_glm)
 S3method(stab_explainer,gstab_lm)
 S3method(summary,gstab_glm)
