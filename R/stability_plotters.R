@@ -80,9 +80,12 @@ plot_data_selection_stability <- function(obj, conf.int) {
   n_terms_strata_boot3 <- nrow(strata_boot_estimates3)
 
   # Create a list to store the plots
-  plot_list <- list()
+  plot_list <- list("bootstrap" = NULL,
+                    "no_outlier" = NULL,
+                    "strata_bootstrap" = NULL)
 
   # Original vs Bootstrap
+  if (!is.null(bootstrap_estimates)) {
   plot_df_bootstrap <- data.frame(
     term = c(original_estimates$term, bootstrap_estimates$term),
     estimate = c(original_estimates$estimate, bootstrap_estimates$estimate),
@@ -92,6 +95,7 @@ plot_data_selection_stability <- function(obj, conf.int) {
   )
 
   plot_list[["bootstrap"]] <- create_plot(plot_df_bootstrap, conf.int)
+  }
 
   # Original vs No Outlier
   if (!is.null(no_outlier_estimates)){
@@ -107,6 +111,7 @@ plot_data_selection_stability <- function(obj, conf.int) {
   }
 
   # Original vs Stratified Bootstrap
+  if (!is.null(strata_boot_estimates1) && !is.null(strata_boot_estimates2) && !is.null(strata_boot_estimates3)) {
   plot_df_strata_boot <- data.frame(
     term = c(original_estimates$term, strata_boot_estimates1$term, strata_boot_estimates2$term, strata_boot_estimates3$term),
     estimate = c(original_estimates$estimate, strata_boot_estimates1$estimate, strata_boot_estimates2$estimate, strata_boot_estimates3$estimate),
@@ -131,6 +136,7 @@ plot_data_selection_stability <- function(obj, conf.int) {
   )
 
   plot_list[["strata_bootstrap"]] <- create_plot(plot_df_strata_boot, conf.int)
+  }
 
   return(plot_list)
 }
