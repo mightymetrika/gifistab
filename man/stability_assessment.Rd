@@ -48,8 +48,8 @@ TRUE. Defaults to 0.95.}
 }
 \value{
 A list containing the results of the stability assessment. The list
-includes the original \code{gstab} object, the summary of the \code{gstab} object, and
-the explanations of the \code{gstab} object.
+includes the original \code{gstab} object, the summary of the \code{gstab} object, the
+plots of the \code{gstab_sum} object, and the explanations of the \code{gstab} object.
 }
 \description{
 Performs a stability assessment of a model based on the framework presented by
@@ -61,11 +61,7 @@ technique.
 }
 \examples{
 # To be provided...
-
 }
 \references{
 Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. \url{https://escholarship.org/uc/item/0789f7d3}
-}
-\seealso{
-\code{\link[base]{do.call}}
 }
