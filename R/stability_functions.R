@@ -1,4 +1,14 @@
-# Helper function to determine the fitting model
+#' Determine the Engine Used for Model Fitting
+#'
+#' This function checks the class of the input model and returns the appropriate
+#' engine function (`stats::lm` or `stats::glm`), used for model fitting. This function is
+#' utilized as a helper in various stability assessments.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#'
+#' @return Function (`stats::lm` or `stats::glm`) corresponding to the input model's class.
+#'
+#' @keywords internal
 fit_model_func <- function(model) {
   if ("lm" %in% class(model)[[1]]) {
     return(stats::lm)
@@ -7,6 +17,26 @@ fit_model_func <- function(model) {
   }
 }
 
+#' Perform Replication Stability Assessment
+#'
+#' This function implements the replication stability assessment. It fits the
+#' original model to a new data set (if provided) and performs bootstrap resampling
+#' (if specified) to assess the stability of the model across different samples.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#' @param data A data frame containing the data used for model fitting.
+#' @param formula A formula describing the model to be fitted.
+#' @param new_data An optional data frame to be used for replication stability
+#' assessment. If provided, the model will be fitted on this new data set.
+#' @param nboot An optional integer specifying the number of bootstrap resamples
+#' to use for replication stability assessment.
+#' @param ... Additional arguments to be passed to the `fit_model` function.
+#'
+#' @return A list containing `new_model` fitted on new_data (if provided),
+#' and `boot_models` which is a list of models fitted on bootstrap samples
+#' (if nboot is provided).
+#'
+#' @keywords internal
 replication_stability <- function(model, data, formula, new_data = NULL, nboot = NULL, ...) {
   new_model <- NULL
   boot_models <- NULL
@@ -27,6 +57,21 @@ replication_stability <- function(model, data, formula, new_data = NULL, nboot =
   list(new_model = new_model, boot_models = boot_models)
 }
 
+#' Perform Statistical Stability Assessment
+#'
+#' This function implements the statistical stability assessment. It fits the
+#' original model to the data with added random noise and with permuted noise, thereby
+#' assessing the model's sensitivity to random variations in the data.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#' @param data A data frame containing the data used for model fitting.
+#' @param formula A formula describing the model to be fitted.
+#' @param ... Additional arguments to be passed to the `fit_model` function.
+#'
+#' @return A list containing `noisy_model` fitted on the data with added random noise
+#' and `permuted_noisy_model` fitted on the data with added permuted noise.
+#'
+#' @keywords internal
 statistical_stability <- function(model, data, formula, ...) {
   noise <- stats::rnorm(nrow(data))
   noisy_data <- data
@@ -43,6 +88,23 @@ statistical_stability <- function(model, data, formula, ...) {
   list(noisy_model = noisy_model, permuted_noisy_model = permuted_noisy_model)
 }
 
+#' Perform Stability Under Data Selection Assessment
+#'
+#' This function implements the stability under data selection assessment. It
+#' fits the specified model on three sets of data: resampled data, data with
+#' outliers removed, and stratified bootstrap data, thereby assessing the model's
+#' sensitivity to outliers and sampling variability.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#' @param data A data frame containing the data used for model fitting.
+#' @param formula A formula describing the model to be fitted.
+#' @param ... Additional arguments to be passed to the `fit_model` function.
+#'
+#' @return A list containing `bootstrap_model` fitted on resampled data,
+#' `no_outlier_model` fitted on data with outliers removed, and `strata_boot_models`
+#' list of models fitted on stratified bootstrap data.
+#'
+#' @keywords internal
 stability_under_data_selection <- function(model, data, formula, ...) {
   bootstrap_data <- data[sample(nrow(data), nrow(data), replace = TRUE), ]
   fit_model <- fit_model_func(model)
