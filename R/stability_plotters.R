@@ -40,27 +40,52 @@ plot_replication_stability <- function(obj, conf.int) {
 
 # Plot function for statistical stability
 plot_statistical_stability <- function(obj, conf.int) {
-  original_estimates <- obj$original_summary
-  noisy_estimates <- obj$statistical_stability_summary$noisy_model
-  permuted_noisy_estimates <- obj$statistical_stability_summary$permuted_noisy_model
 
-  n_terms_original <- nrow(original_estimates)
-  n_terms_noisy <- nrow(noisy_estimates)
-  n_terms_permuted_noisy <- nrow(permuted_noisy_estimates)
+  # Initialize empty plot_df
+  plot_df <- data.frame()
 
-  # Create a data frame for plotting
-  plot_df <- data.frame(
-    term = c(original_estimates$term, noisy_estimates$term, permuted_noisy_estimates$term),
-    estimate = c(original_estimates$estimate, noisy_estimates$estimate, permuted_noisy_estimates$estimate),
-    conf.low = if(conf.int) c(original_estimates$conf.low, noisy_estimates$conf.low, permuted_noisy_estimates$conf.low) else c(rep(NA, n_terms_original), rep(NA, n_terms_noisy), rep(NA, n_terms_permuted_noisy)),
-    conf.high = if(conf.int) c(original_estimates$conf.high, noisy_estimates$conf.high, permuted_noisy_estimates$conf.high) else c(rep(NA, n_terms_original), rep(NA, n_terms_noisy), rep(NA, n_terms_permuted_noisy)),
-    type = c(rep("Original", n_terms_original), rep("Noisy", n_terms_noisy), rep("Permuted Noisy", n_terms_permuted_noisy))
-  )
+  # Check for NULL and add to plot_df accordingly
+  if (!is.null(obj$original_summary)) {
+    original_estimates <- obj$original_summary
+    n_terms_original <- nrow(original_estimates)
+    plot_df <- rbind(plot_df, data.frame(
+      term = original_estimates$term,
+      estimate = original_estimates$estimate,
+      conf.low = if(conf.int) original_estimates$conf.low else rep(NA, n_terms_original),
+      conf.high = if(conf.int) original_estimates$conf.high else rep(NA, n_terms_original),
+      type = rep("Original", n_terms_original)
+    ))
+  }
+
+  if (!is.null(obj$statistical_stability_summary$noisy_model)) {
+    noisy_estimates <- obj$statistical_stability_summary$noisy_model
+    n_terms_noisy <- nrow(noisy_estimates)
+    plot_df <- rbind(plot_df, data.frame(
+      term = noisy_estimates$term,
+      estimate = noisy_estimates$estimate,
+      conf.low = if(conf.int) noisy_estimates$conf.low else rep(NA, n_terms_noisy),
+      conf.high = if(conf.int) noisy_estimates$conf.high else rep(NA, n_terms_noisy),
+      type = rep("Noisy", n_terms_noisy)
+    ))
+  }
+
+  if (!is.null(obj$statistical_stability_summary$permuted_noisy_model)) {
+    permuted_noisy_estimates <- obj$statistical_stability_summary$permuted_noisy_model
+    n_terms_permuted_noisy <- nrow(permuted_noisy_estimates)
+    plot_df <- rbind(plot_df, data.frame(
+      term = permuted_noisy_estimates$term,
+      estimate = permuted_noisy_estimates$estimate,
+      conf.low = if(conf.int) permuted_noisy_estimates$conf.low else rep(NA, n_terms_permuted_noisy),
+      conf.high = if(conf.int) permuted_noisy_estimates$conf.high else rep(NA, n_terms_permuted_noisy),
+      type = rep("Permuted Noisy", n_terms_permuted_noisy)
+    ))
+  }
 
   # Create the plot
   p <- create_plot(plot_df, conf.int)
   return(p)
 }
+
 
 # Plot function for data selection stability
 plot_data_selection_stability <- function(obj, conf.int) {

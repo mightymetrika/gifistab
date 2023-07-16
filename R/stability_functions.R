@@ -73,20 +73,49 @@ replication_stability <- function(model, data, formula, new_data = NULL, nboot =
 #'
 #' @keywords internal
 statistical_stability <- function(model, data, formula, ...) {
-  noise <- stats::rnorm(nrow(data))
-  noisy_data <- data
+  family <- family(model)$family
   response_variable <- all.vars(formula)[1]
-  noisy_data[[response_variable]] <- noisy_data[[response_variable]] + noise
+
+  if (family == "gaussian") {
+    noise <- stats::rnorm(nrow(data))
+  } else if (family == "binomial" || family == "quasibinomial") {
+    flip_fraction <- 0.01  # Set the fraction of values to flip
+    if (round(nrow(data) * flip_fraction) >= 1){
+      flip_indices <- sample(nrow(data), size = round(nrow(data) * flip_fraction))
+    } else {
+      flip_indices <- sample(nrow(data), size = 1)
+    }
+    noise <- rep(0, nrow(data))
+    noise[flip_indices] <- 1
+  } else if (family == "gamma") {
+    noise <- stats::rgamma(nrow(data), 0.4)
+  } else if (family == "inverse.gaussian") {
+    mu <- mean(data[[response_variable]])
+    lambda <- stats::var(data[[response_variable]]) / mu
+    noise <- SuppDists::rinvGauss(nrow(data), mu, lambda) - mu
+  } else if (family == "poisson" || family == "quasipoisson") {
+    noise <- stats::rpois(nrow(data), 0.15)
+  } else {
+    stop(paste("The", family, "family is not supported."))
+  }
+
+  noisy_data <- data
+  #noisy_data[[response_variable]] <- noisy_data[[response_variable]] + noise
+  noisy_data[[response_variable]] <- ifelse(family == "binomial", abs(noisy_data[[response_variable]] - noise), noisy_data[[response_variable]] + noise)
+
   fit_model <- fit_model_func(model)
   noisy_model <- fit_model(formula, data = noisy_data, ...)
 
   permuted_noise <- sample(noise)
   permuted_noisy_data <- data
-  permuted_noisy_data[[response_variable]] <- permuted_noisy_data[[response_variable]] + permuted_noise
+  #permuted_noisy_data[[response_variable]] <- permuted_noisy_data[[response_variable]] + permuted_noise
+  permuted_noisy_data[[response_variable]] <- ifelse(family == "binomial", abs(permuted_noisy_data[[response_variable]] - permuted_noise), permuted_noisy_data[[response_variable]] + permuted_noise)
+
   permuted_noisy_model <- fit_model(formula, data = permuted_noisy_data, ...)
 
   list(noisy_model = noisy_model, permuted_noisy_model = permuted_noisy_model)
 }
+
 
 #' Perform Stability Under Data Selection Assessment
 #'
@@ -217,6 +246,17 @@ numerical_stability <- function(model, data, formula, ...) {
 
   # Identify numeric columns
   num_cols <- which(sapply(data, is.numeric))
+
+  # Exclude factor variables
+  factor_cols <- which(sapply(data, is.factor))
+  num_cols <- setdiff(num_cols, factor_cols)
+
+  # If the family of the model is binomial, quasibinomial, poisson, or quasipoisson, exclude the response variable
+  family <- family(model)$family
+  if (family %in% c("binomial", "quasibinomial", "poisson", "quasipoisson")) {
+    response_variable <- all.vars(formula)[1]
+    num_cols <- setdiff(num_cols, which(names(data) == response_variable))
+  }
 
   # Create a copy of the data
   data_noisy <- data
