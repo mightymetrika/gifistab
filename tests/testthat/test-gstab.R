@@ -1,13 +1,6 @@
 test_that("Test that gstab.lm and summary.gstab_lm works", {
-  n <- 20
-  set.seed(376)
-  data <- data.frame(y = 3*stats::rnorm(n) +5,
-                     x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                     x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-
   formula <- y ~ x1 + x2
-
-  model <- stats::lm(formula, data = data)
+  model <- stats::lm(formula, data = n20_seed376_lm)
 
   #Test with nboot
   stab_res <- gstab(model = model, nboot = 100)
@@ -19,11 +12,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
                            "analytic_and_algebraic_stability_summary", "technique_stability_summary"))
 
   #Test with new data
-  set.seed(500)
-  new_data <- data.frame(y = 3*stats::rnorm(n) +5,
-                     x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                     x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-  stab_res <- gstab(model, new_data = new_data)
+  stab_res <- gstab(model, new_data = n20_seed500_lm)
   stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
@@ -50,7 +39,7 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
                            "analytic_and_algebraic_stability_summary", "technique_stability_summary"))
 
   #Test with all parameters set
-  stab_res <- gstab(model = model, nboot = 100, new_data = new_data,
+  stab_res <- gstab(model = model, nboot = 100, new_data = n20_seed500_lm,
                     variable_to_remove = "x2", variable_of_interest = "x1")
   stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_lm")
@@ -60,17 +49,11 @@ test_that("Test that gstab.lm and summary.gstab_lm works", {
                            "analytic_and_algebraic_stability_summary", "technique_stability_summary"))
 })
 
-test_that("Test that gstab.glm works and summary.gstab_lm works", {
-  # Generating example data
-  n <- 20
-  set.seed(376)
-  data <- data.frame(y = stats::rbinom(n, 1, 0.5),
-                      x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                      x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
+test_that("Test that gstab.glm works and summary.gstab_glm works", {
   formula <- y ~ x1 + x2
 
   # Fit the model
-  model <- stats::glm(formula, family = binomial, data = data)
+  model <- stats::glm(formula, family = binomial, data = n20_seed376_bin)
 
   #Test with nboot
   stab_res <- suppressWarnings(gstab(model = model, nboot = 100))
@@ -82,11 +65,7 @@ test_that("Test that gstab.glm works and summary.gstab_lm works", {
                            "analytic_and_algebraic_stability_summary", "technique_stability_summary"))
 
   #Test with new data
-  set.seed(500)
-  new_data <- data.frame(y = stats::rbinom(n, 1, 0.5),
-                         x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                         x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-  stab_res <- suppressWarnings(gstab(model, new_data = new_data))
+  stab_res <- suppressWarnings(gstab(model, new_data = n20_seed500_bin))
   stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
@@ -115,17 +94,12 @@ test_that("Test that gstab.glm works and summary.gstab_lm works", {
 
 })
 
-test_that("Test that gstab.glm and summary.gstab_lm work with family = poisson", {
-  # Generating example data
-  n <- 20
-  set.seed(587)
-  data <- data.frame(y = stats::rpois(n, 10),
-                     x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                     x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
+test_that("Test that gstab.glm and summary.gstab_glm work with family = poisson", {
   formula <- y ~ x1 + x2
 
   # Fit the model
-  model <- stats::glm(formula, family = poisson(link = "log"), data = data)
+  model <- stats::glm(formula, family = poisson(link = "log"),
+                      data = n20_seed587_pois)
 
   #Test with nboot
   stab_res <- suppressWarnings(gstab(model = model, nboot = 100))
@@ -137,11 +111,7 @@ test_that("Test that gstab.glm and summary.gstab_lm work with family = poisson",
                            "analytic_and_algebraic_stability_summary", "technique_stability_summary"))
 
   #Test with new data
-  set.seed(500)
-  new_data <- data.frame(y = stats::rpois(n, 10),
-                     x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                     x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-  stab_res <- suppressWarnings(gstab(model, new_data = new_data))
+  stab_res <- suppressWarnings(gstab(model, new_data = n20_seed500_pois))
   stab_sum <- summary(stab_res, conf.int = FALSE)
   expect_s3_class(stab_res, "gstab_glm")
   expect_named(stab_sum, c("original_summary", "replication_stability_summary",
