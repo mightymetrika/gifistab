@@ -4,7 +4,7 @@
 \alias{statistical_stability}
 \title{Perform Statistical Stability Assessment}
 \usage{
-statistical_stability(model, data, formula, ...)
+statistical_stability(model, data, formula, nf = 0.05, ...)
 }
 \arguments{
 \item{model}{A fitted model object, either of class \code{lm} or \code{glm}.}
@@ -12,6 +12,12 @@ statistical_stability(model, data, formula, ...)
 \item{data}{A data frame containing the data used for model fitting.}
 
 \item{formula}{A formula describing the model to be fitted.}
+
+\item{nf}{Noise factor as a percentage. The amount of noise added to the
+response variable will be nf multiplied by the response variable's standard
+deviation after transformation or the percentage of response values to flip
+(i.e, change 0 to 1 or 1 to 0) when the family is binomial or quasi binomial
+and the response variable is binary.}
 
 \item{...}{Additional arguments to be passed to the \code{fit_model} function.}
 }
