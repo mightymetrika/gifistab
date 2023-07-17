@@ -66,41 +66,40 @@ replication_stability <- function(model, data, formula, new_data = NULL, nboot =
 #' @param model A fitted model object, either of class `lm` or `glm`.
 #' @param data A data frame containing the data used for model fitting.
 #' @param formula A formula describing the model to be fitted.
+#' @param nf Noise factor as a percentage. The amount of noise added to the
+#' response variable will be nf multiplied by the response variable's standard
+#' deviation after transformation or the percentage of response values to flip
+#' (i.e, change 0 to 1 or 1 to 0) when the family is binomial or quasi binomial
+#' and the response variable is binary.
 #' @param ... Additional arguments to be passed to the `fit_model` function.
 #'
 #' @return A list containing `noisy_model` fitted on the data with added random noise
 #' and `permuted_noisy_model` fitted on the data with added permuted noise.
 #'
 #' @keywords internal
-statistical_stability <- function(model, data, formula, ...) {
+statistical_stability <- function(model, data, formula, nf = 0.05, ...) {
   family <- family(model)$family
   response_variable <- all.vars(formula)[1]
-
-  noise_sd <- 1  # standard deviation of the noise, change this as needed
 
   sf_flag <- ifelse(all(data[[response_variable]] %in% c(0, 1)), 1, 0)
 
   if (family == "gaussian") {
-    noise <- stats::rnorm(nrow(data), sd = noise_sd)
     response_transform <- function(x) x  # identity transformation
     inverse_transform <- function(x) x  # inverse of identity is identity
   } else if (family == "gamma" || family == "inverse.gaussian") {
-    noise <- stats::rnorm(nrow(data), sd = noise_sd)
     response_transform <- function(x) log(x)  # log transformation
     inverse_transform <- function(x) exp(x)  # inverse of log
   } else if (family == "poisson" || family == "quasipoisson") {
-    noise <- stats::rnorm(nrow(data), sd = noise_sd)
     response_transform <- function(x) log(x + 1)  # log transformation
     inverse_transform <- function(x) pmax(0, round(exp(x) - 1))  # inverse of log, rounded to nearest integer and capped at 0
   } else if (family == "binomial" || family == "quasibinomial") {
     if (sf_flag == 1) {
-      flip_fraction <- 0.01  # adjust this as needed
+      flip_fraction <- nf  # adjust this as needed
       flip_indices <- sample(nrow(data), size = round(nrow(data) * flip_fraction))
       noise <- rep(0, nrow(data))
       noise[flip_indices] <- 1
       noisy_response <- abs(data[[response_variable]] - noise)
     } else {
-      noise <- stats::rnorm(nrow(data), sd = noise_sd)
       response_transform <- function(x) log(x / (1 - x))  # logit transformation
       inverse_transform <- function(x) 1 / (1 + exp(-x))  # inverse of logit
     }
@@ -110,6 +109,8 @@ statistical_stability <- function(model, data, formula, ...) {
 
   if (sf_flag == 0) {
     transformed_response <- response_transform(data[[response_variable]])
+    noise_sd <- stats::sd(transformed_response) * nf  # standard deviation of the transformed response variable times noise factor
+    noise <- stats::rnorm(nrow(data), sd = noise_sd)
     noisy_response <- inverse_transform(transformed_response + noise)
   }
 

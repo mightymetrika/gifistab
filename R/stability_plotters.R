@@ -226,7 +226,7 @@ plot_analytic_and_algebraic_stability <- function(obj) {
     ggplot2::geom_col(fill = "steelblue") +
     ggplot2::geom_hline(yintercept = 30, linetype = "dashed", color = "red") +
     ggplot2::annotate("text", x = 1, y = 31, label = "Kappa = 30", hjust = 0) +
-    ggplot2::labs(y = "Kappa", x = "", title = "Analytic and Algebraic Stability") +
+    ggplot2::labs(y = "Kappa", x = "", title = "") +
     ggplot2::theme_minimal()
 
   return(p)
