@@ -76,45 +76,66 @@ statistical_stability <- function(model, data, formula, ...) {
   family <- family(model)$family
   response_variable <- all.vars(formula)[1]
 
+  noise_sd <- 1  # standard deviation of the noise, change this as needed
+
+  sf_flag <- ifelse(all(data[[response_variable]] %in% c(0, 1)), 1, 0)
+
   if (family == "gaussian") {
-    noise <- stats::rnorm(nrow(data))
-  } else if (family == "binomial" || family == "quasibinomial") {
-    flip_fraction <- 0.01  # Set the fraction of values to flip
-    if (round(nrow(data) * flip_fraction) >= 1){
-      flip_indices <- sample(nrow(data), size = round(nrow(data) * flip_fraction))
-    } else {
-      flip_indices <- sample(nrow(data), size = 1)
-    }
-    noise <- rep(0, nrow(data))
-    noise[flip_indices] <- 1
-  } else if (family == "gamma") {
-    noise <- stats::rgamma(nrow(data), 0.4)
-  } else if (family == "inverse.gaussian") {
-    mu <- mean(data[[response_variable]])
-    lambda <- stats::var(data[[response_variable]]) / mu
-    noise <- SuppDists::rinvGauss(nrow(data), mu, lambda) - mu
+    noise <- stats::rnorm(nrow(data), sd = noise_sd)
+    response_transform <- function(x) x  # identity transformation
+    inverse_transform <- function(x) x  # inverse of identity is identity
+  } else if (family == "gamma" || family == "inverse.gaussian") {
+    noise <- stats::rnorm(nrow(data), sd = noise_sd)
+    response_transform <- function(x) log(x)  # log transformation
+    inverse_transform <- function(x) exp(x)  # inverse of log
   } else if (family == "poisson" || family == "quasipoisson") {
-    noise <- stats::rpois(nrow(data), 0.15)
+    noise <- stats::rnorm(nrow(data), sd = noise_sd)
+    response_transform <- function(x) log(x + 1)  # log transformation
+    inverse_transform <- function(x) pmax(0, round(exp(x) - 1))  # inverse of log, rounded to nearest integer and capped at 0
+  } else if (family == "binomial" || family == "quasibinomial") {
+    if (sf_flag == 1) {
+      flip_fraction <- 0.01  # adjust this as needed
+      flip_indices <- sample(nrow(data), size = round(nrow(data) * flip_fraction))
+      noise <- rep(0, nrow(data))
+      noise[flip_indices] <- 1
+      noisy_response <- abs(data[[response_variable]] - noise)
+    } else {
+      noise <- stats::rnorm(nrow(data), sd = noise_sd)
+      response_transform <- function(x) log(x / (1 - x))  # logit transformation
+      inverse_transform <- function(x) 1 / (1 + exp(-x))  # inverse of logit
+    }
   } else {
     stop(paste("The", family, "family is not supported."))
   }
 
+  if (sf_flag == 0) {
+    transformed_response <- response_transform(data[[response_variable]])
+    noisy_response <- inverse_transform(transformed_response + noise)
+  }
+
   noisy_data <- data
-  #noisy_data[[response_variable]] <- noisy_data[[response_variable]] + noise
-  noisy_data[[response_variable]] <- ifelse(family == "binomial", abs(noisy_data[[response_variable]] - noise), noisy_data[[response_variable]] + noise)
+  noisy_data[[response_variable]] <- noisy_response
 
   fit_model <- fit_model_func(model)
   noisy_model <- fit_model(formula, data = noisy_data, ...)
 
   permuted_noise <- sample(noise)
+
+  if (sf_flag == 0) {
+    permuted_noisy_response <- inverse_transform(transformed_response + permuted_noise)
+  } else {
+    permuted_noisy_response <- abs(data[[response_variable]] - permuted_noise)
+  }
+
   permuted_noisy_data <- data
-  #permuted_noisy_data[[response_variable]] <- permuted_noisy_data[[response_variable]] + permuted_noise
-  permuted_noisy_data[[response_variable]] <- ifelse(family == "binomial", abs(permuted_noisy_data[[response_variable]] - permuted_noise), permuted_noisy_data[[response_variable]] + permuted_noise)
+  permuted_noisy_data[[response_variable]] <- permuted_noisy_response
 
   permuted_noisy_model <- fit_model(formula, data = permuted_noisy_data, ...)
 
   list(noisy_model = noisy_model, permuted_noisy_model = permuted_noisy_model)
 }
+
+
 
 
 #' Perform Stability Under Data Selection Assessment
