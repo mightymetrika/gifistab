@@ -216,23 +216,46 @@ plot_numerical_stability <- function(obj, conf.int) {
   return(p)
 }
 
+# plot_analytic_and_algebraic_stability <- function(obj) {
+#
+#   # Create a data frame for plotting
+#   plot_df <- data.frame(kappa = obj$analytic_and_algebraic_stability_summary, model = "Model")
+#
+#   # Create the plot
+#   p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = model, y = kappa)) +
+#     ggplot2::geom_col(fill = "steelblue") +
+#     ggplot2::geom_hline(yintercept = 30, linetype = "dashed", color = "red") +
+#     ggplot2::annotate("text", x = 1, y = 31, label = "Kappa = 30", hjust = 0) +
+#     ggplot2::labs(y = "Kappa", x = "", title = "") +
+#     ggplot2::theme_minimal()
+#
+#   return(p)
+# }
+
 plot_analytic_and_algebraic_stability <- function(obj) {
 
   # Create a data frame for plotting
-  plot_df <- data.frame(kappa = obj$analytic_and_algebraic_stability_summary, model = "Model")
+  plot_df <- data.frame(kappa = c(obj$analytic_and_algebraic_stability_summary$L1,
+                                  obj$analytic_and_algebraic_stability_summary$Linf),
+                        norm = c("L1", "Linf"))
 
   # Create the plot
-  p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = model, y = kappa)) +
-    ggplot2::geom_col(fill = "steelblue") +
+  p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = norm, y = kappa, fill = norm)) +
+    ggplot2::geom_col() +
     ggplot2::geom_hline(yintercept = 30, linetype = "dashed", color = "red") +
     ggplot2::annotate("text", x = 1, y = 31, label = "Kappa = 30", hjust = 0) +
-    ggplot2::labs(y = "Kappa", x = "", title = "") +
-    ggplot2::theme_minimal()
+    ggplot2::labs(y = "Kappa", x = "Norm", title = "") +
+    ggplot2::theme_minimal() +
+    ggplot2::scale_fill_manual(values = c("L1" = "steelblue", "Linf" = "skyblue"))
 
   return(p)
 }
 
 plot_technique_stability <- function(obj, conf.int) {
+  if (is.null(obj$technique_stability_summary)) {
+    message("Technique stability plot cannot be created because model did not converge.")
+    return(NULL)
+  }
 
   # Extract the original and robust regression summaries
   original_estimates <- obj$original_summary
