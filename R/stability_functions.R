@@ -59,18 +59,31 @@ replication_stability <- function(model, data, formula, new_data = NULL, nboot =
 
 #' Perform Statistical Stability Assessment
 #'
-#' This function implements the statistical stability assessment. It fits the
-#' original model to the data with added random noise and with permuted noise, thereby
-#' assessing the model's sensitivity to random variations in the data.
+#' This function implements the statistical stability assessment by fitting the
+#' original model to the data with added random noise and permuted noise. It takes into
+#' account the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson,
+#' quasi-Poisson, binomial, quasi-binomial), and assesses the model's sensitivity to
+#' random variations in the data.
+#'
+#' The function first determines the family of the model and applies the appropriate
+#' transformation to the response variable. For Gaussian, gamma, and inverse Gaussian
+#' families, it uses an identity or log transformation; for Poisson and quasi-Poisson,
+#' a log transformation; and for binomial and quasi-binomial, a logit transformation
+#' or a binary flip depending on whether the response variable is a proportion or binary.
+#'
+#' If the response variable is binary (determined using a 'success/failure' flag), the
+#' function flips a fraction of the response variable (changes from 0 to 1 or from 1 to 0).
+#' For non-binary variables, it adds normally distributed noise to the transformed response.
+#' After adding the noise, the inverse of the transformation is applied to the noisy response
+#' to bring it back to the original scale.
 #'
 #' @param model A fitted model object, either of class `lm` or `glm`.
 #' @param data A data frame containing the data used for model fitting.
 #' @param formula A formula describing the model to be fitted.
-#' @param nf Noise factor as a percentage. The amount of noise added to the
-#' response variable will be nf multiplied by the response variable's standard
-#' deviation after transformation or the percentage of response values to flip
-#' (i.e, change 0 to 1 or 1 to 0) when the family is binomial or quasi binomial
-#' and the response variable is binary.
+#' @param nf Noise factor as a percentage. For non-binomial families, this is used to
+#' determine the standard deviation of the noise added to the transformed response
+#' variable. For binomial families with a binary response, this is used to determine
+#' the fraction of the response variable to flip (i.e., change 0 to 1 or 1 to 0).
 #' @param ... Additional arguments to be passed to the `fit_model` function.
 #'
 #' @return A list containing `noisy_model` fitted on the data with added random noise
@@ -135,9 +148,6 @@ statistical_stability <- function(model, data, formula, nf = 0.05, ...) {
 
   list(noisy_model = noisy_model, permuted_noisy_model = permuted_noisy_model)
 }
-
-
-
 
 #' Perform Stability Under Data Selection Assessment
 #'
