@@ -30,8 +30,14 @@ summary_analytic_and_algebraic_stability <- function(obj){
 }
 
 summary_technique_stability <- function(obj, conf.int, conf.level){
-  broom::tidy(obj, conf.int, conf.level)
+  tryCatch({
+    broom::tidy(obj, conf.int, conf.level)
+  }, error = function(e) {
+    message("Error in tidying model: ", e$message)
+    return(NULL)
+  })
 }
+
 
 # Helpers
 

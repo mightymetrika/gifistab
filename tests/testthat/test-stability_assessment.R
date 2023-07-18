@@ -457,3 +457,39 @@ test_that("stability_assessment stats::glm engine works with factors", {
   expect_equal(length(sa_res), 4)
   rm(sa_res)
 })
+
+test_that("stability_assessment stats::lm engine works when
+          stability_under_selection_of_technique model fails to converge", {
+  formula <- y ~ x1 + x2 + x4
+
+  # Test with no extra paramets
+  sa_res <- suppressWarnings(stability_assessment(data = n20_seed376_lm,
+                                                  formula = formula,
+                                                  engine = stats::lm))
+
+  expect_equal(length(sa_res), 4)
+  expect_s3_class(sa_res$gstab$stability$stability_under_selection_of_technique,
+                  "lmrob")
+  expect_null(sa_res$gstab_summary$technique_stability_summary)
+  expect_null(sa_res$gstab_plot$technique_stability_plot)
+
+})
+
+test_that("stability_assessment stats::glm engine works when
+          stability_under_selection_of_technique model fails to converge", {
+            formula <- y ~ x1 + x2 + x3 + x4 + x1:x2 + x3:x4 + x2:x3
+
+            # Test with no extra paramets
+            sa_res <- suppressWarnings(stability_assessment(data = n20_seed376_bin,
+                                                            formula = formula,
+                                                            engine = stats::glm,
+                                                            family = binomial))
+
+            expect_equal(length(sa_res), 4)
+            expect_s3_class(sa_res$gstab$stability$stability_under_selection_of_technique,
+                            "glmrob")
+            expect_s3_class(sa_res$gstab_summary$technique_stability_summary,
+                            "data.frame")
+            expect_s3_class(sa_res$gstab_plot$technique_stability_plot, "gg")
+
+          })

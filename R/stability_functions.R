@@ -289,9 +289,16 @@ numerical_stability <- function(model, data, formula, ...) {
   fit_model(formula, data = data_noisy, ...)
 }
 
-analytic_and_algebraic_stability <- function(model, ...) {
-  kappa <- kappa(model)
-  if (kappa > 30) warning("Severe multicollinearity detected")
+analytic_and_algebraic_stability <- function(model, warn = TRUE, ...) {
+  L1 <- kappa(model, term = "O")
+  Linf <- kappa(model, term = "I")
+
+  if (warn) {
+    if (L1 > 30) warning("Severe multicollinearity detected (L1 norm)")
+    if (Linf > 30) warning("Severe multicollinearity detected (Linf norm)")
+  }
+
+  kappa <- list(L1 = L1, Linf = Linf)
   return(kappa)
 }
 
@@ -301,8 +308,14 @@ stability_under_selection_of_technique <- function(model, data, formula, ...) {
   tryCatch({
     if ("lm" %in% class(model)[[1]]) {
       robust_regression = robustbase::lmrob(formula, data = data, ...)
+      if (!robust_regression$converged) {
+        stop("Robust regression did not converge.")
+      }
     } else if ("glm" %in% class(model)[[1]]) {
       robust_regression = robustbase::glmrob(formula, data = data, ...)
+      if (!robust_regression$converged) {
+        stop("Robust regression did not converge.")
+      }
     }
   }, error = function(e) {
     message("Error in fitting robust regression: ", e$message)
@@ -310,3 +323,4 @@ stability_under_selection_of_technique <- function(model, data, formula, ...) {
 
   robust_regression
 }
+
