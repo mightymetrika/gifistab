@@ -52,16 +52,44 @@ stab_explainer.gstab_lm <- function(object) {
 
       In general, a model with good replication stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data."
     ),
+    # "Statistical Stability" = list(
+    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
+    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with added random noise and with permuted noise. This measures the model's sensitivity to random variations in the data.
+    #
+    #   The random noise is added to the response variable in the data. This ensures that the noise is independent of the other variables in the data. The permuted noise is created by randomly shuffling the order of the noise values. This ensures that the noise is not correlated with the other variables in the data.
+    #
+    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with noisy data. Significant differences between the original model and the models fitted with noisy data may suggest a lack of statistical stability.",
+    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with noisy data, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with noisy data, then the model may not be statistically stable.
+    #
+    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
+    # ),
+    # "Statistical Stability" = list(
+    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
+    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
+    #
+    #   For non-binomial families, the function first transforms the response variable according to the model's family, and then adds normally distributed noise to the transformed response. The inverse of the transformation is then applied to the noisy response to get back to the original scale. For binomial families, a fraction of the response variable is randomly flipped (changed from 0 to 1 or from 1 to 0).
+    #
+    #   The permuted noise is created by randomly shuffling the order of the noise values and then adding the noise to the response variable. This ensures that the noise is not correlated with the other variables in the data.
+    #
+    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with a noisy response. Significant differences between the original model and the models fitted with added noise may suggest a lack of statistical stability.",
+    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with a noisy response, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with added noise, then the model may not be statistically stable.
+    #
+    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
+    # ),
     "Statistical Stability" = list(
       definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
-      explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with added random noise and with permuted noise. This measures the model's sensitivity to random variations in the data.
+      explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
 
-      The random noise is added to the response variable in the data. This ensures that the noise is independent of the other variables in the data. The permuted noise is created by randomly shuffling the order of the noise values. This ensures that the noise is not correlated with the other variables in the data.
+      The function determines the family of the model and applies the appropriate transformation to the response variable. For Gaussian, gamma, and inverse Gaussian families, the function uses an identity or log transformation; for Poisson and quasi-Poisson, a log transformation; and for binomial and quasi-binomial, a logit transformation or a binary flip depending on whether the response variable is a proportion or binary.
 
-      The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with noisy data. Significant differences between the original model and the models fitted with noisy data may suggest a lack of statistical stability.",
-      interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with noisy data, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with noisy data, then the model may not be statistically stable.
+      If the response variable is binary (a 'success/failure' flag is used to determine this), the function flips a fraction of the response variable (changes from 0 to 1 or from 1 to 0). For non-binary variables, the function adds normally distributed noise to the transformed response. After adding noise, the inverse of the transformation is applied to the noisy response to bring it back to the original scale.
 
-      In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
+      The permuted noise is created by randomly shuffling the order of the noise values and then adding this noise to the response variable.
+
+      The coefficients, standard errors, and p-values of the original model are compared to those of the models fitted with a noisy response. Significant differences between these models may suggest a lack of statistical stability.",
+      interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to those of the models fitted with a noisy response, then the model is considered to be statistically stable. However, if there are significant differences between these models, then the model may not be statistically stable.
+
+      In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when applied to different samples of data with different noise levels."
     ),
     "Stability under Data Selection" = list(
       definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis. The former corresponds to rejection of outliers and resampling techniques. In this framework, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new data set (Michailides and de Leeuw, 1998).",
@@ -96,14 +124,27 @@ stab_explainer.gstab_lm <- function(object) {
       Once the data has been perturbed, the function fits the model again. The results of the two fits are then compared. If the results are similar, then the model is considered to be numerically stable. However, if the results are different, then the model may be numerically unstable.",
       interpretation = "The results of the numerical stability function can be used to assess the robustness of a model to rounding errors and limited precision computations. If the results of the function show that the model is numerically stable, then the model is considered to be robust. However, if the results of the function show that the model is not numerically stable, then the model may be sensitive to rounding errors and may not be a reliable predictor."
     ),
+    # "Analytic and Algebraic Stability" = list(
+    #   definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
+    #   explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
+    #
+    #   The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
+    #
+    #   A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
+    #   interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
+    # ),
     "Analytic and Algebraic Stability" = list(
       definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
-      explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
+      explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating two condition numbers (kappa): one based on the L1 norm and another based on the Linf norm of the model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
 
-      The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
+      The L1 norm, also known as the Manhattan distance or taxicab norm, is the sum of the absolute values of the elements in a vector. The L1 norm-based condition number provides a measure of multicollinearity based on the maximum possible effect that a small change in a single variable can have on the estimated coefficients.
 
-      A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
-      interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
+      The Linf norm, also known as the infinity norm or maximum norm, is the maximum absolute value in a vector. The Linf norm-based condition number provides a measure of multicollinearity based on the maximum possible effect that simultaneous small changes in all variables can have on the estimated coefficients.
+
+      The function calculates the condition numbers using the 'kappa' function from base R, which calculates the ratio of the largest to smallest singular values of the model's predictor matrix. These condition numbers are returned in a list, with the L1 norm condition number labeled as 'L1' and the Linf norm condition number labeled as 'Linf'.
+
+      A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if either condition number is above 30, as this is considered to be the threshold for severe multicollinearity.",
+      interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If either condition number is high, then the model may be unstable under slight changes in the independent variables. However, if both condition numbers are low, then the model is considered to be robust. In general, both the L1 and Linf norms provide useful information about multicollinearity, but they emphasize different aspects of the data. The L1 norm is more sensitive to outliers because it considers the sum of all the values, while the Linf norm is determined by the maximum value."
     ),
     "Stability under Selection of Technique" = list(
       definition = "Application of a number of different techniques to the same data set, aiming at answering the same question, results in approximately the same information (Michailides and de Leeuw, 1998).",
@@ -153,16 +194,44 @@ stab_explainer.gstab_glm <- function(object) {
 
       In general, a model with good replication stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data."
     ),
+    # "Statistical Stability" = list(
+    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
+    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with added random noise and with permuted noise. This measures the model's sensitivity to random variations in the data.
+    #
+    #   The random noise is added to the response variable in the data. This ensures that the noise is independent of the other variables in the data. The permuted noise is created by randomly shuffling the order of the noise values. This ensures that the noise is not correlated with the other variables in the data.
+    #
+    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with noisy data. Significant differences between the original model and the models fitted with noisy data may suggest a lack of statistical stability.",
+    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with noisy data, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with noisy data, then the model may not be statistically stable.
+    #
+    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
+    # ),
+    # "Statistical Stability" = list(
+    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
+    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
+    #
+    #   For non-binomial families, the function first transforms the response variable according to the model's family, and then adds normally distributed noise to the transformed response. The inverse of the transformation is then applied to the noisy response to get back to the original scale. For binomial families, a fraction of the response variable is randomly flipped (changed from 0 to 1 or from 1 to 0).
+    #
+    #   The permuted noise is created by randomly shuffling the order of the noise values and then adding the noise to the response variable. This ensures that the noise is not correlated with the other variables in the data.
+    #
+    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with a noisy response. Significant differences between the original model and the models fitted with added noise may suggest a lack of statistical stability.",
+    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with a noisy response, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with added noise, then the model may not be statistically stable.
+    #
+    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
+    # ),
     "Statistical Stability" = list(
       definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
-      explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with added random noise and with permuted noise. This measures the model's sensitivity to random variations in the data.
+      explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
 
-      The random noise is added to the response variable in the data. This ensures that the noise is independent of the other variables in the data. The permuted noise is created by randomly shuffling the order of the noise values. This ensures that the noise is not correlated with the other variables in the data.
+      The function determines the family of the model and applies the appropriate transformation to the response variable. For Gaussian, gamma, and inverse Gaussian families, the function uses an identity or log transformation; for Poisson and quasi-Poisson, a log transformation; and for binomial and quasi-binomial, a logit transformation or a binary flip depending on whether the response variable is a proportion or binary.
 
-      The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with noisy data. Significant differences between the original model and the models fitted with noisy data may suggest a lack of statistical stability.",
-      interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with noisy data, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with noisy data, then the model may not be statistically stable.
+      If the response variable is binary (a 'success/failure' flag is used to determine this), the function flips a fraction of the response variable (changes from 0 to 1 or from 1 to 0). For non-binary variables, the function adds normally distributed noise to the transformed response. After adding noise, the inverse of the transformation is applied to the noisy response to bring it back to the original scale.
 
-      In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
+      The permuted noise is created by randomly shuffling the order of the noise values and then adding this noise to the response variable.
+
+      The coefficients, standard errors, and p-values of the original model are compared to those of the models fitted with a noisy response. Significant differences between these models may suggest a lack of statistical stability.",
+      interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to those of the models fitted with a noisy response, then the model is considered to be statistically stable. However, if there are significant differences between these models, then the model may not be statistically stable.
+
+      In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when applied to different samples of data with different noise levels."
     ),
     "Stability under Data Selection" = list(
       definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis (Michailides and de Leeuw, 1998).",
@@ -191,14 +260,27 @@ stab_explainer.gstab_glm <- function(object) {
       Once the data has been perturbed, the function fits the model again. The results of the two fits are then compared. If the results are similar, then the model is considered to be numerically stable. However, if the results are different, then the model may be numerically unstable.",
       interpretation = "The results of the numerical stability function can be used to assess the robustness of a model to rounding errors and limited precision computations. If the results of the function show that the model is numerically stable, then the model is considered to be robust. However, if the results of the function show that the model is not numerically stable, then the model may be sensitive to rounding errors and may not be a reliable predictor."
     ),
+    # "Analytic and Algebraic Stability" = list(
+    #   definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
+    #   explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
+    #
+    #   The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
+    #
+    #   A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
+    #   interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
+    # ),
     "Analytic and Algebraic Stability" = list(
       definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
-      explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
+      explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating two condition numbers (kappa): one based on the L1 norm and another based on the Linf norm of the model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
 
-      The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
+      The L1 norm, also known as the Manhattan distance or taxicab norm, is the sum of the absolute values of the elements in a vector. The L1 norm-based condition number provides a measure of multicollinearity based on the maximum possible effect that a small change in a single variable can have on the estimated coefficients.
 
-      A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
-      interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
+      The Linf norm, also known as the infinity norm or maximum norm, is the maximum absolute value in a vector. The Linf norm-based condition number provides a measure of multicollinearity based on the maximum possible effect that simultaneous small changes in all variables can have on the estimated coefficients.
+
+      The function calculates the condition numbers using the 'kappa' function from base R, which calculates the ratio of the largest to smallest singular values of the model's predictor matrix. These condition numbers are returned in a list, with the L1 norm condition number labeled as 'L1' and the Linf norm condition number labeled as 'Linf'.
+
+      A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if either condition number is above 30, as this is considered to be the threshold for severe multicollinearity.",
+      interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If either condition number is high, then the model may be unstable under slight changes in the independent variables. However, if both condition numbers are low, then the model is considered to be robust. In general, both the L1 and Linf norms provide useful information about multicollinearity, but they emphasize different aspects of the data. The L1 norm is more sensitive to outliers because it considers the sum of all the values, while the Linf norm is determined by the maximum value."
     ),
     "Stability under Selection of Technique" = list(
       definition = "Application of a number of different techniques to the same data set, aiming at answering the same question, results in approximately the same information (Michailides and de Leeuw, 1998).",
