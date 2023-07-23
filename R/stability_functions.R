@@ -201,6 +201,26 @@ stability_under_data_selection <- function(model, data, formula, ...) {
        strata_boot_models = strata_boot_models)
 }
 
+#' Stability Under Model Selection
+#'
+#' This function assesses the stability of a model under three types of specification changes:
+#' 1. Toggling the intercept: This involves either removing the intercept from a model that includes it or adding the intercept to a model that excludes it.
+#' 2. Removing a specific variable: The function allows you to specify a particular variable to be removed from the model. If the specified variable is part of an interaction term, only the interaction will be removed, leaving the main effects in place.
+#' 3. Removing the least useful variable: This approach uses a backward stepwise selection process to identify and remove the least useful variable that is not the variable of interest.
+#'
+#' @param model A fitted model object. This can be of class `lm` or `glm`.
+#' @param data A data frame containing the data that was used to fit the model.
+#' @param formula A formula that describes the model to be fitted.
+#' @param variable_to_remove A character string specifying a variable to be removed from the model. If the variable is part of an interaction term, the interaction is removed but not the main effects.
+#' @param variable_of_interest A character string or a vector of strings specifying the variable(s) of interest for the stability analysis under backward selection. If the variable of interest is part of an interaction term, all variables in the interaction are considered to be of interest.
+#' @param ... Other parameters to be passed to the `lmtest::lrtest` function.
+#'
+#' @return A list with three components:
+#' - `toggle_intercept`: This is an object of class `lmtest::lrtest` that compares the fit of the model with and without an intercept.
+#' - `remove_variable`: This is either an object of class `lmtest::lrtest` that compares the fit of the model with and without the variable specified in `variable_to_remove` parameter, or NULL if the `variable_to_remove` parameter is NULL.
+#' - `remove_least_useful`: This is either an object of class `lmtest::lrtest` that compares the fit of the full model and a model obtained by backward selection that retains the variable(s) specified in `variable_of_interest`, or NULL if the `variable_of_interest` parameter is NULL.
+#'
+#' @keywords internal
 stability_under_model_selection <- function(model, data, formula, variable_to_remove = NULL, variable_of_interest = NULL, ...) {
   has_intercept <- attr(stats::terms(model), "intercept")
   fit_model <- fit_model_func(model)
@@ -244,35 +264,63 @@ stability_under_model_selection <- function(model, data, formula, variable_to_re
 
     # Ensure variable_of_interest is in the model
     if (!all(variable_of_interest %in% all.vars(formula))) {
-      stop(paste("One or more variables of interest", paste(variable_of_interest, collapse = ", "), "are not in the model."))
+      stop(paste("One or more variables of interest",
+                 paste(variable_of_interest, collapse = ", "),
+                 "are not in the model."))
     }
 
     # Expand any shorthand interactions in the formula
     formula <- stats::reformulate(labels(stats::terms(formula)), formula[[2]])
 
     # Find all variables and interactions that include any variable in variable_of_interest
-    vars_to_keep <- all.vars(formula)[grepl(paste0("\\b(", paste(variable_of_interest, collapse = "|"), ")\\b"), all.vars(formula))]
+    vars_to_keep <- all.vars(formula)[grepl(paste0("\\b(",
+                                                   paste(variable_of_interest,
+                                                         collapse = "|"), ")\\b"),
+                                            all.vars(formula))]
 
     # Find all unique variables involved in these terms
     unique_vars <- unique(unlist(strsplit(vars_to_keep, ":|\\+")))
 
     # The "lower" model includes the variable of interest, its interactions,
     # and the variables involved in these interactions
-    lower_formula <- stats::as.formula(paste(formula[[2]], "~", paste(unique_vars, collapse = " + ")))
+    lower_formula <- stats::as.formula(paste(formula[[2]], "~",
+                                             paste(unique_vars, collapse = " + ")))
 
     # The full model includes all variables
     full_model <- fit_model(formula, data = data)
 
     # Perform backward selection, but keep the lower model in the scope
-    new_model <- MASS::stepAIC(full_model, direction = "backward", scope = list(lower = lower_formula, upper = formula))
+    new_model <- MASS::stepAIC(full_model,
+                               direction = "backward",
+                               scope = list(lower = lower_formula, upper = formula))
 
     # Perform likelihood ratio test
     remove_least_useful <- lmtest::lrtest(full_model, new_model)
   }
 
-  list(toggle_intercept = toggle_intercept, remove_variable = remove_variable, remove_least_useful = remove_least_useful)
+  list(toggle_intercept = toggle_intercept,
+       remove_variable = remove_variable,
+       remove_least_useful = remove_least_useful)
 }
 
+#' Numerical Stability Assessment
+#'
+#' This function assesses the numerical stability of a fitted model by introducing
+#' a small perturbation to the numerical variables in the dataset and comparing
+#' the resulting model to the original. The results of the function can be used
+#' to assess the robustness of a model to rounding errors and limited precision
+#' computations.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#' @param data A data frame containing the data used for model fitting.
+#' @param formula A formula describing the model to be fitted.
+#' @param ... Other parameters to be passed to the fitting function determined by
+#' `fit_model_func`.
+#'
+#' @return The function returns the fitted model object obtained from the perturbed
+#' data.
+#'
+#' @keywords internal
 numerical_stability <- function(model, data, formula, ...) {
   fit_model <- fit_model_func(model)
 
@@ -283,7 +331,8 @@ numerical_stability <- function(model, data, formula, ...) {
   factor_cols <- which(sapply(data, is.factor))
   num_cols <- setdiff(num_cols, factor_cols)
 
-  # If the family of the model is binomial, quasibinomial, poisson, or quasipoisson, exclude the response variable
+  # If the family of the model is binomial, quasibinomial, poisson, or quasipoisson,
+  #exclude the response variable
   family <- family(model)$family
   if (family %in% c("binomial", "quasibinomial", "poisson", "quasipoisson")) {
     response_variable <- all.vars(formula)[1]
@@ -299,6 +348,20 @@ numerical_stability <- function(model, data, formula, ...) {
   fit_model(formula, data = data_noisy, ...)
 }
 
+#' Analytic and Algebraic Stability Assessment
+#'
+#' This function assesses the analytic and algebraic stability of a fitted model
+#' by calculating two condition numbers (kappa): one based on the L1 norm and
+#' another based on the Linf norm of the model matrix.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#' @param warn Logical. If TRUE (default), warnings are printed when the condition
+#' number indicates severe multicollinearity (i.e., > 30).
+#' @param ... Other parameters to be passed to the `kappa` function.
+#'
+#' @return A list with the L1 norm and Linf norm condition numbers.
+#'
+#' @keywords internal
 analytic_and_algebraic_stability <- function(model, warn = TRUE, ...) {
   L1 <- kappa(model, term = "O")
   Linf <- kappa(model, term = "I")
@@ -312,6 +375,22 @@ analytic_and_algebraic_stability <- function(model, warn = TRUE, ...) {
   return(kappa)
 }
 
+#' Stability Under Selection of Technique Assessment
+#'
+#' This function assesses the stability of a fitted model under the application
+#' of different techniques. It fits a robust regression model using the same
+#' specification as the original model and compares the results.
+#'
+#' @param model A fitted model object, either of class `lm` or `glm`.
+#' @param data A data frame containing the data used for model fitting.
+#' @param formula A formula describing the model to be fitted.
+#' @param ... Other parameters passed to `robustbase::lmrob` or `robustbase::glmrob`.
+#'
+#' @return A fitted robust regression model object (`robustbase::lmrob` or
+#' `robustbase::glmrob`), or NULL if the robust regression model could not be
+#' fitted.
+#'
+#' @keywords internal
 stability_under_selection_of_technique <- function(model, data, formula, ...) {
   robust_regression <- NULL
 
