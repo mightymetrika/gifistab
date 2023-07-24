@@ -1,3 +1,23 @@
+#' Create Replication Stability Assessment Plot
+#'
+#' This internal function creates ggplot objects for the replication stability
+#' assessment. It generates two separate plots, one comparing original model
+#' estimates with new model estimates, and another comparing original model
+#' estimates with bootstrap mean estimates.
+#'
+#' @param obj A list object returned from the `replication_stability` function,
+#' containing original model summary, and summaries for new model and bootstrap
+#' models.
+#' @param conf.int Logical variable. If `TRUE`, add error bars to the points in
+#' the plot, representing confidence intervals.
+#'
+#' @return A list containing ggplot2 objects. The list includes `new` which is a
+#' ggplot object of the comparison between original and new model estimates
+#' (if new data was provided), and `boot` which is a ggplot object of the
+#' comparison between original and bootstrap mean estimates (if bootstrap
+#' resampling was performed).
+#'
+#' @keywords internal
 plot_replication_stability <- function(obj, conf.int) {
   original_estimates <- obj$original_summary
   new_estimates <- obj$replication_stability_summary$new_model
@@ -37,8 +57,22 @@ plot_replication_stability <- function(obj, conf.int) {
   return(out)
 }
 
-
-# Plot function for statistical stability
+#' Create Statistical Stability Assessment Plot
+#'
+#' This internal function creates a ggplot object for the statistical stability
+#' assessment. It generates a plot comparing original model estimates with
+#' estimates from models fitted on data with added noise and permuted noise.
+#'
+#' @param obj A list object returned from the `statistical_stability` function,
+#' containing original model summary, and summaries for models fitted on noisy
+#' data and permuted noisy data.
+#' @param conf.int Logical variable. If `TRUE`, add error bars to the points in
+#' the plot, representing confidence intervals.
+#'
+#' @return A ggplot2 object of the comparison between original, noisy, and
+#' permuted noisy model estimates.
+#'
+#' @keywords internal
 plot_statistical_stability <- function(obj, conf.int) {
 
   # Initialize empty plot_df
@@ -86,8 +120,23 @@ plot_statistical_stability <- function(obj, conf.int) {
   return(p)
 }
 
-
-# Plot function for data selection stability
+#' Create Stability under Data Selection Assessment Plot
+#'
+#' This function creates a list of ggplot objects for the stability under data
+#' selection assessment. It generates plots comparing original model estimates
+#' with estimates from models fitted on resampled data, data with outliers
+#' removed, and stratified bootstrap data.
+#'
+#' @param obj A list object returned from the `stability_under_data_selection`
+#' function, containing original model summary, and summaries for models fitted
+#' on bootstrap data, no outlier data, and three stratified bootstrap datasets.
+#' @param conf.int Logical variable. If `TRUE`, add error bars to the points in
+#' the plot, representing confidence intervals.
+#'
+#' @return A list of ggplot2 objects of the comparison between original and
+#' various data selected model estimates.
+#'
+#' @keywords internal
 plot_data_selection_stability <- function(obj, conf.int) {
   original_estimates <- obj$original_summary
   bootstrap_estimates <- obj$data_selection_stability_summary$bootstrap_model
@@ -166,6 +215,21 @@ plot_data_selection_stability <- function(obj, conf.int) {
   return(plot_list)
 }
 
+#' Create Stability under Model Selection Assessment Plot
+#'
+#' This function creates a ggplot object for the stability under model selection
+#' assessment. It generates a bar plot comparing p-values for the original model
+#' with those from models with the intercept toggled, a user-selected variable
+#' removed, and the least useful variable removed.
+#'
+#' @param obj A list object returned from the `stability_under_model_selection`
+#' function, containing summaries for models with the intercept toggled, a
+#' user-selected variable removed, and the least useful variable removed.
+#'
+#' @return A ggplot2 object of the comparison of p-values among various model
+#' selection strategies. If there are no data to plot, the function will return `NULL` and issue a warning.
+#'
+#' @keywords internal
 plot_model_selection_stability <- function(obj) {
   # Extract the summaries
   toggle_intercept_summary <- if (nrow(obj$model_selection_stability_summary$toggle_intercept) > 0)
@@ -279,7 +343,22 @@ plot_technique_stability <- function(obj, conf.int) {
   return(plot)
 }
 
-
+#' Create Stability Assessment Plot
+#'
+#' This internal function creates a ggplot object for the stability assessment.
+#' It plots estimates for each term in the model and differentiates types with
+#' color. Additionally, if `conf.int` is `TRUE`, it adds error bars to the points,
+#' representing confidence intervals.
+#'
+#' @param plot_df A data frame containing the data to be used for plotting.
+#' This data frame should contain columns 'term', 'estimate', 'type', and if
+#' `conf.int` is `TRUE`, 'conf.low' and 'conf.high'.
+#' @param conf.int Logical variable. If `TRUE`, add error bars to the points in
+#' the plot, representing confidence intervals.
+#'
+#' @return A ggplot2 object of the stability assessment plot.
+#'
+#' @keywords internal
 create_plot <- function(plot_df, conf.int) {
   p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = term, y = estimate, color = type)) +
     ggplot2::geom_point() +
