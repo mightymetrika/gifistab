@@ -4,12 +4,16 @@ stability_app <- function(){
     shiny::column(
       width = 4,
       shiny::fileInput("datafile", "Choose CSV File", accept = c(".csv")),
+      shiny::fileInput("newdatafile", "Choose New CSV File (Optional)", accept = c(".csv")),
       shiny::textInput("formula", "Enter the formula (e.g., y ~ x1 + x2)"),
       shiny::radioButtons("model_type", "Choose Model Type:", choices = c("lm", "glm")),
       shiny::conditionalPanel(
         condition = "input.model_type == 'glm'",
         shiny::selectInput("family", "Choose Family:", choices = c("binomial", "gaussian", "poisson", "Gamma", "inverse.gaussian", "quasi"))
       ),
+      shiny::numericInput("nboot", "Number of Bootstrap Resamples (Optional)", value = NULL, min = 1, max = 10000),
+      shiny::textInput("variable_to_remove", "Variable to Remove (Optional)"),
+      shiny::textInput("variable_of_interest", "Variable of Interest (Optional)"),
       shiny::actionButton("go", "Perform Stability Assessment"),
       shiny::selectInput("stability_type", "Choose Stability Assessment Type:", choices = c("Replication Stability", "Statistical Stability", "Stability under Data Selection", "Stability under Model Selection", "Numerical Stability", "Analytic and Algebraic Stability", "Stability under Selection of Technique"))
     ),
@@ -26,10 +30,11 @@ stability_app <- function(){
     stability_results <- shiny::eventReactive(input$go, {
       shiny::req(input$datafile)  # Ensure a file has been uploaded
       data <- utils::read.csv(input$datafile$datapath)
+      new_data <- if (!is.null(input$newdatafile$datapath)) utils::read.csv(input$newdatafile$datapath) else NULL
       formula <- stats::as.formula(input$formula)
       engine <- if (input$model_type == "lm") stats::lm else stats::glm
       family <- if (input$model_type == "glm") get(input$family)() else NULL
-      stability_assessment(data, formula, engine, family = family)
+      stability_assessment(data, formula, engine, new_data = new_data, nboot = input$nboot, variable_to_remove = input$variable_to_remove, variable_of_interest = input$variable_of_interest, family = family)
     }, ignoreNULL = FALSE)
 
     output$main_summary <- shiny::renderTable({
