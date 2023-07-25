@@ -60,7 +60,10 @@ stability, analytic and algebraic stability, and stability under selection of
 technique.
 }
 \examples{
-# To be provided...
+formula <- y ~ x1 + x2
+stability_assessment(data = n20_seed376_lm,
+                     formula = formula,
+                     engine = stats::lm)
 }
 \references{
 Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. \url{https://escholarship.org/uc/item/0789f7d3}

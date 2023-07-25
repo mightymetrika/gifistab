@@ -9,12 +9,7 @@
 #' @return Depends on the method called. If 'lm', a list with the original model
 #' and the results of each stability check.
 #'
-#'
-#' @examples
-#' # Assuming that `fit` is a fitted model of class 'lm'
-#' #gstab(fit)
-#'
-#' @export
+#' @keywords internal
 gstab <- function(model, ...) {
   UseMethod("gstab")
 }
@@ -45,21 +40,8 @@ gstab <- function(model, ...) {
 #' Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate
 #' analysis. eScholarship, University of California, Los Angeles.
 #' https://escholarship.org/uc/item/0789f7d3
-#' @export
-#' @examples
-#' # Generating example data
-#' n <- 20
-#' set.seed(376)
-#' data <- data.frame(y = 3*stats::rnorm(n) +5,
-#'                    x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-#'                    x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-#' formula <- y ~ x1 + x2
 #'
-#' # Fit the model
-#' model <- stats::lm(formula, data = data)
-#'
-#' # Performing stability analysis
-#' gstab(model = model, nboot = 100)
+#' @keywords internal
 gstab.lm <- function(model, new_data = NULL, nboot = NULL,
                      variable_to_remove = NULL,
                      variable_of_interest = NULL, ...) {
@@ -116,21 +98,8 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL,
 #' @return A list with the original model and the results of each stability check.
 #' @references
 #' Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. https://escholarship.org/uc/item/0789f7d3
-#' @export
-#' @examples
-#' # Generating example data
-#' n <- 20
-#' set.seed(376)
-#' data <- data.frame(y = rbinom(n, 1, 0.5),
-#'                    x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-#'                    x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-#' formula <- y ~ x1 + x2
 #'
-#' # Fit the model
-#' model <- stats::glm(formula, family = binomial, data = data)
-#'
-#' # Performing stability analysis
-#' gstab(model = model, nboot = 100)
+#' @keywords internal
 gstab.glm <- function(model, new_data = NULL, nboot = NULL,
                       variable_to_remove = NULL,
                       variable_of_interest = NULL, ...) {

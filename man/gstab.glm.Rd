@@ -42,21 +42,7 @@ under model selection, numerical stability, analytic and algebraic stability,
 and stability under selection of technique. The output is a list with the
 original model and the results of each stability check.
 }
-\examples{
-# Generating example data
-n <- 20
-set.seed(376)
-data <- data.frame(y = rbinom(n, 1, 0.5),
-                   x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                   x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-formula <- y ~ x1 + x2
-
-# Fit the model
-model <- stats::glm(formula, family = binomial, data = data)
-
-# Performing stability analysis
-gstab(model = model, nboot = 100)
-}
 \references{
 Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. https://escholarship.org/uc/item/0789f7d3
 }
+\keyword{internal}

@@ -6,14 +6,8 @@
 #'
 #' @return A list of explanations and interpretations for each type of stability
 #' analysis.
-#' @export
 #'
-#' @seealso
-#'   \code{\link[base]{UseMethod}}
-#'
-#' @examples
-#' # To be provided...
-#'
+#' @keywords internal
 stab_explainer <- function(object) {
   UseMethod("stab_explainer")
 }
@@ -27,14 +21,8 @@ stab_explainer <- function(object) {
 #'
 #' @return A list of explanations and interpretations for each type of stability
 #' analysis for linear models.
-#' @export
 #'
-#' @seealso
-#'   \code{\link[base]{UseMethod}}
-#'
-#' @examples
-#' # To be provided...
-#'
+#' @keywords internal
 stab_explainer.gstab_lm <- function(object) {
 
   stability_definitions <- list(
@@ -169,14 +157,8 @@ stab_explainer.gstab_lm <- function(object) {
 #'
 #' @return A list of explanations and interpretations for each type of stability
 #' analysis for generalized linear models.
-#' @export
 #'
-#' @seealso
-#'   \code{\link[base]{UseMethod}}
-#'
-#' @examples
-#' # To be provided...
-#'
+#' @keywords internal
 stab_explainer.gstab_glm <- function(object) {
 
   stability_definitions <- list(

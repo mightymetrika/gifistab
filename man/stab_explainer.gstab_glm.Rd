@@ -17,10 +17,4 @@ analysis for generalized linear models.
 Provides explanations and interpretations for each type of stability analysis
 for generalized linear models.
 }
-\examples{
-# To be provided...
-
-}
-\seealso{
-\code{\link[base]{UseMethod}}
-}
+\keyword{internal}

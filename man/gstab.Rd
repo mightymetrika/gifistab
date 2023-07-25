@@ -19,8 +19,4 @@ and the results of each stability check.
 Generic function for performing a stability analysis on a model. It calls the
 appropriate method based on the class of its argument.
 }
-\examples{
-# Assuming that `fit` is a fitted model of class 'lm'
-#gstab(fit)
-
-}
+\keyword{internal}

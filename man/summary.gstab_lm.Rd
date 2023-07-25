@@ -23,20 +23,4 @@ A list with a summary of the original model and summaries of each stability chec
 \description{
 This function generates a summary of the stability analysis performed by 'gstab.lm'. It summarizes the original model and each stability check, returning a list of these summaries.
 }
-\examples{
-# Assuming that `model` is an object of class 'gstab_lm'
-n <- 20
-set.seed(376)
-data <- data.frame(y = 3*stats::rnorm(n) +5,
-                   x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-                   x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-
-formula <- y ~ x1 + x2
-model <- stats::lm(formula, data = data)
-
-stab_res <- gstab(model = model, nboot = 100)
-summary(stab_res, conf.int = TRUE, conf.level = 0.95)
-}
-\seealso{
-\code{\link{gstab}} for performing the stability analysis,
-}
+\keyword{internal}
