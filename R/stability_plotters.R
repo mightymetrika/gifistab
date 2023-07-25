@@ -262,6 +262,22 @@ plot_model_selection_stability <- function(obj) {
   return(p)
 }
 
+#' Create Numerical Stability Assessment Plot
+#'
+#' This function creates a ggplot object for the numerical stability assessment.
+#' It visualizes the comparison of the original model estimates and the estimates
+#' from the model fitted on data perturbed by a small amount of random noise.
+#'
+#' @param obj A list object returned from the `numerical_stability` function,
+#' containing summaries for the original model and the model fitted on perturbed
+#' data.
+#' @param conf.int A number indicating the confidence interval level
+#' (e.g., 0.95 for a 95% confidence interval).
+#'
+#' @return A ggplot2 object of the comparison of estimates from the original
+#' model and the perturbed model.
+#'
+#' @keywords internal
 plot_numerical_stability <- function(obj, conf.int) {
 
   # Extract the summary of the numerical stability model
@@ -296,6 +312,20 @@ plot_numerical_stability <- function(obj, conf.int) {
 #   return(p)
 # }
 
+#' Create Analytic and Algebraic Stability Assessment Plot
+#'
+#' This function creates a ggplot object for the analytic and algebraic stability
+#' assessment. It visualizes the comparison of condition numbers (kappa) based
+#' on the L1 and Linf norms.
+#'
+#' @param obj A list object returned from the `analytic_and_algebraic_stability`
+#' function, containing the condition numbers for L1 and Linf norms.
+#'
+#' @return A ggplot2 object displaying the condition numbers based on the L1 and
+#' Linf norms, indicating the sensitivity of the model to changes in the
+#' independent variables.
+#'
+#' @keywords internal
 plot_analytic_and_algebraic_stability <- function(obj) {
 
   # Create a data frame for plotting
@@ -315,6 +345,23 @@ plot_analytic_and_algebraic_stability <- function(obj) {
   return(p)
 }
 
+#' Create Stability Under Selection of Technique Assessment Plot
+#'
+#' This function generates a ggplot object that visualizes the comparison between
+#' the original model and a robust regression model, assessing the stability of
+#' the model under different fitting techniques.
+#'
+#' @param obj A list object returned from the 'stability_under_selection_of_technique'
+#' function, containing the model summaries for the original and robust regression
+#' models.
+#' @param conf.int Logical. If TRUE, confidence intervals are added to the plot.
+#'
+#' @return A ggplot2 object showing the model estimates from the original and
+#' robust regression models, demonstrating the stability of the model under
+#' different fitting techniques. If the robust model did not converge, a NULL
+#' object is returned.
+#'
+#' @keywords internal
 plot_technique_stability <- function(obj, conf.int) {
   if (is.null(obj$technique_stability_summary)) {
     message("Technique stability plot cannot be created because model did not converge.")

@@ -10,22 +10,8 @@
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A list with a summary of the original model and summaries of each stability check.
-#' @seealso
-#' \code{\link{gstab}} for performing the stability analysis,
-#' @export
-#' @examples
-#' # Assuming that `model` is an object of class 'gstab_lm'
-#' n <- 20
-#' set.seed(376)
-#' data <- data.frame(y = 3*stats::rnorm(n) +5,
-#'                    x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-#'                    x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
 #'
-#' formula <- y ~ x1 + x2
-#' model <- stats::lm(formula, data = data)
-#'
-#' stab_res <- gstab(model = model, nboot = 100)
-#' summary(stab_res, conf.int = TRUE, conf.level = 0.95)
+#' @keywords internal
 summary.gstab_lm <- function(object, conf.int, conf.level, ...) {
 
   # Original model
@@ -81,22 +67,8 @@ summary.gstab_lm <- function(object, conf.int, conf.level, ...) {
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A list with the summary of the original model and the summaries of each stability check.
-#' @export
-#' @examples
-#'   # Generating example data
-#' n <- 20
-#' set.seed(376)
-#' data <- data.frame(y = stats::rbinom(n, 1, 0.5),
-#'                    x1 = 3*stats::rnorm(n) +5 + stats::rnorm(n, 2, 0.3),
-#'                    x2 = 2*stats::rnorm(n) + 1.5*stats::rnorm(n) + stats::rnorm(n, 1, 0.05))
-#' formula <- y ~ x1 + x2
 #'
-#' # Fit the model
-#' model <- stats::glm(formula, family = binomial, data = data)
-#'
-#' #Test with nboot
-#' stab_res <- suppressWarnings(gstab(model = model, nboot = 100))
-#' stab_sum <- summary(stab_res, conf.int = FALSE)
+#' @keywords internal
 summary.gstab_glm <- function(object, conf.int, conf.level, ...) {
 
   # Apply each type of summary

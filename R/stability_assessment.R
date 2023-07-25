@@ -36,7 +36,10 @@
 #' @export
 #'
 #' @examples
-#' # To be provided...
+#' formula <- y ~ x1 + x2
+#' stability_assessment(data = n20_seed376_lm,
+#'                      formula = formula,
+#'                      engine = stats::lm)
 stability_assessment <- function(data, formula, engine, new_data = NULL,
                                  nboot = NULL, variable_to_remove = NULL,
                                  variable_of_interest = NULL,
