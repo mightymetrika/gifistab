@@ -1,5 +1,4 @@
 stability_app <- function(){
-
   ui <- shiny::fluidPage(
     shiny::column(
       width = 4,
@@ -15,7 +14,8 @@ stability_app <- function(){
       shiny::textInput("variable_to_remove", "Variable to Remove (Optional)"),
       shiny::textInput("variable_of_interest", "Variable of Interest (Optional)"),
       shiny::actionButton("go", "Perform Stability Assessment"),
-      shiny::selectInput("stability_type", "Choose Stability Assessment Type:", choices = c("Replication Stability", "Statistical Stability", "Stability under Data Selection", "Stability under Model Selection", "Numerical Stability", "Analytic and Algebraic Stability", "Stability under Selection of Technique"))
+      shiny::selectInput("stability_type", "Choose Stability Assessment Type:", choices = c("Replication Stability", "Statistical Stability", "Stability under Data Selection", "Stability under Model Selection", "Numerical Stability", "Analytic and Algebraic Stability", "Stability under Selection of Technique")),
+      shiny::uiOutput("subtype_select")  # Create UI output for subtype selection
     ),
     shiny::column(
       width = 8,
@@ -27,6 +27,26 @@ stability_app <- function(){
   )
 
   server <- function(input, output, session) {
+    # Define the subtypes for each stability assessment
+    stability_subtypes <- list(
+      "Replication Stability" = c("New Model", "Bootstrap Models"),
+      "Statistical Stability" = NULL,
+      "Stability under Model Selection" = NULL,
+      "Stability under Data Selection" = c("Bootstrap Model", "No Outlier Model", "Strata Bootstrap Model"),
+      "Numerical Stability" = NULL,
+      "Analytic and Algebraic Stability" = NULL,
+      "Stability under Selection of Technique" = NULL
+    )
+
+    # Update the choices of the subtype input when the type input changes
+    output$subtype_select <- shiny::renderUI({
+      if (!is.null(stability_subtypes[[input$stability_type]])) {
+        shiny::selectInput("stability_subtype", "Choose Subtype (If Applicable):", choices = stability_subtypes[[input$stability_type]])
+      } else {
+        NULL
+      }
+    })
+
     stability_results <- shiny::eventReactive(input$go, {
       shiny::req(input$datafile)  # Ensure a file has been uploaded
       data <- utils::read.csv(input$datafile$datapath)
@@ -45,27 +65,37 @@ stability_app <- function(){
     output$summary_table <- shiny::renderTable({
       shiny::req(stability_results())
       summary_type <- switch(input$stability_type,
-                             "Replication Stability" = "replication_stability_summary",
+                             "Replication Stability" = switch(input$stability_subtype,
+                                                              "New Model" = "replication_stability_summary$new_model",
+                                                              "Bootstrap Models" = "replication_stability_summary$boot_models"),
                              "Statistical Stability" = "statistical_stability_summary",
-                             "Stability under Data Selection" = "data_selection_stability_summary",
+                             "Stability under Data Selection" = switch(input$stability_subtype,
+                                                                       "Bootstrap Model" = "data_selection_stability_summary$bootstrap_model",
+                                                                       "No Outlier Model" = "data_selection_stability_summary$no_outlier_model",
+                                                                       "Strata Bootstrap Model" = "data_selection_stability_summary$strata_boot_model"),
                              "Stability under Model Selection" = "model_selection_stability_summary",
                              "Numerical Stability" = "numerical_stability_summary",
                              "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_summary",
                              "Stability under Selection of Technique" = "technique_stability_summary")
-      stability_results()$gstab_summary[[summary_type]]
+      eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
     })
 
     output$stability_plot <- shiny::renderPlot({
       shiny::req(stability_results())
       plot_type <- switch(input$stability_type,
-                          "Replication Stability" = "replication_stability_plot",
+                          "Replication Stability" = switch(input$stability_subtype,
+                                                           "New Model" = "replication_stability_plot$new",
+                                                           "Bootstrap Models" = "replication_stability_plot$boot"),
                           "Statistical Stability" = "statistical_stability_plot",
-                          "Stability under Data Selection" = "data_selection_stability_plot",
+                          "Stability under Data Selection" = switch(input$stability_subtype,
+                                                                    "Bootstrap Model" = "data_selection_stability_plot$bootstrap",
+                                                                    "No Outlier Model" = "data_selection_stability_plot$no_outlier",
+                                                                    "Strata Bootstrap Model" = "data_selection_stability_plot$strata_bootstrap"),
                           "Stability under Model Selection" = "model_selection_stability_plot",
                           "Numerical Stability" = "numerical_stability_plot",
                           "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_plot",
                           "Stability under Selection of Technique" = "technique_stability_plot")
-      print(stability_results()$gstab_plot[[plot_type]])
+      print(eval(parse(text = paste0("stability_results()$gstab_plot$", plot_type))))
     })
 
     output$explanation <- shiny::renderPrint({

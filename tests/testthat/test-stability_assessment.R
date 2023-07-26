@@ -6,6 +6,19 @@ test_that("stability_assessment works with the stats::lm engine", {
   expect_equal(length(sa_res), 4)
 })
 
+test_that("stability_assessment works with the stats::lm engine with all option
+          specified", {
+  formula <- y ~ x1 + x2
+  sa_res <- suppressWarnings(stability_assessment(data = n20_seed376_lm,
+                                                  new_data = n20_seed500_lm,
+                                                  nboot = 100,
+                                                  variable_to_remove = "x2",
+                                                  variable_of_interest = "x1",
+                                                  formula = formula,
+                                                  engine = stats::lm))
+  expect_equal(length(sa_res), 4)
+})
+
 
 test_that("stability_assessment works with the stats::glm engine", {
   formula <- y ~ x1 + x2
