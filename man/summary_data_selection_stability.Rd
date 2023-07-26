@@ -17,18 +17,21 @@ returned.}
 \item{conf.level}{The confidence level to use for the confidence intervals.}
 }
 \value{
-A list with five elements:
+A list with three elements:
 \itemize{
 \item 'bootstrap_model': A tidy data frame summarizing the model fitted on
 resampled data.
 \item 'no_outlier_model': A tidy data frame summarizing the model fitted on data
 with outliers removed.
+\item 'strata_boot_model': A list of three stratified bootstrap fitted models
+\itemize{
 \item 'strata_boot_model1': A tidy data frame summarizing the first model fitted
 on stratified bootstrap data.
 \item 'strata_boot_model2': A tidy data frame summarizing the second model fitted
 on stratified bootstrap data.
 \item 'strata_boot_model3': A tidy data frame summarizing the third model fitted
 on stratified bootstrap data.
+}
 }
 }
 \description{

@@ -141,9 +141,9 @@ plot_data_selection_stability <- function(obj, conf.int) {
   original_estimates <- obj$original_summary
   bootstrap_estimates <- obj$data_selection_stability_summary$bootstrap_model
   no_outlier_estimates <- obj$data_selection_stability_summary$no_outlier_model
-  strata_boot_estimates1 <- obj$data_selection_stability_summary$strata_boot_model1
-  strata_boot_estimates2 <- obj$data_selection_stability_summary$strata_boot_model2
-  strata_boot_estimates3 <- obj$data_selection_stability_summary$strata_boot_model3
+  strata_boot_estimates1 <- obj$data_selection_stability_summary$strata_boot_model$strata_boot_model1
+  strata_boot_estimates2 <- obj$data_selection_stability_summary$strata_boot_model$strata_boot_model2
+  strata_boot_estimates3 <- obj$data_selection_stability_summary$strata_boot_model$strata_boot_model3
 
 
   n_terms_original <- nrow(original_estimates)

@@ -60,17 +60,18 @@ summary_statistical_stability <- function(obj, conf.int, conf.level){
 #' returned.
 #' @param conf.level The confidence level to use for the confidence intervals.
 #'
-#' @return A list with five elements:
+#' @return A list with three elements:
 #' - 'bootstrap_model': A tidy data frame summarizing the model fitted on
 #'    resampled data.
 #' - 'no_outlier_model': A tidy data frame summarizing the model fitted on data
 #'    with outliers removed.
-#' - 'strata_boot_model1': A tidy data frame summarizing the first model fitted
-#'    on stratified bootstrap data.
-#' - 'strata_boot_model2': A tidy data frame summarizing the second model fitted
-#'    on stratified bootstrap data.
-#' - 'strata_boot_model3': A tidy data frame summarizing the third model fitted
-#'    on stratified bootstrap data.
+#' - 'strata_boot_model': A list of three stratified bootstrap fitted models
+#'      - 'strata_boot_model1': A tidy data frame summarizing the first model fitted
+#'        on stratified bootstrap data.
+#'      - 'strata_boot_model2': A tidy data frame summarizing the second model fitted
+#'        on stratified bootstrap data.
+#'      - 'strata_boot_model3': A tidy data frame summarizing the third model fitted
+#'        on stratified bootstrap data.
 #'
 #' @keywords internal
 summary_data_selection_stability <- function(obj, conf.int, conf.level){
@@ -79,7 +80,15 @@ summary_data_selection_stability <- function(obj, conf.int, conf.level){
               strata_boot_model1 = obj[["strata_boot_models"]][[1]],
               strata_boot_model2 = obj[["strata_boot_models"]][[2]],
               strata_boot_model3 = obj[["strata_boot_models"]][[3]])
-  tidy_list_elements(obj, conf.int = conf.int, conf.level = conf.level)
+  mods <- tidy_list_elements(obj, conf.int = conf.int, conf.level = conf.level)
+
+  mods <- list(bootstrap_model = mods[["bootstrap_model"]],
+               no_outlier_model = mods[["no_outlier_model"]],
+               strata_boot_model = list(strata_boot_model1 = mods[["strata_boot_model1"]],
+                                        strata_boot_model2 = mods[["strata_boot_model2"]],
+                                        strata_boot_model3 = mods[["strata_boot_model3"]]))
+
+  return(mods)
 }
 
 #' Summary Statistics for Stability Under Model Selection
@@ -133,11 +142,12 @@ summary_numerical_stability <- function(obj, conf.int, conf.level){
 #' @param obj A list object returned by the `analytic_and_algebraic_stability`
 #' function, containing the L1 norm and Linf norm condition numbers of the model.
 #'
-#' @return The function directly returns the input argument `obj`, which is a list
-#' containing the L1 norm and Linf norm condition numbers of the model.
+#' @return The function returns a data frame with the L1 norm and Linf norm
+#' condition numbers of the model.
 #'
 #' @keywords internal
 summary_analytic_and_algebraic_stability <- function(obj){
+  obj <- data.frame(obj)
   return(obj)
 }
 

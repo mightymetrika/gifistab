@@ -62,7 +62,42 @@ stability_app <- function(){
       stability_results()$gstab_summary$original_summary
     })
 
-    output$summary_table <- shiny::renderTable({
+    is_list_of_dataframes <- function(x) {
+      is.list(x) && all(sapply(x, function(y) inherits(y, "data.frame")))
+    }
+
+    # An observer that creates a new table output for each tibble in the selected summary
+    shiny::observe({
+      tryCatch({
+        shiny::req(stability_results())
+        summary_type <- switch(input$stability_type,
+                               "Replication Stability" = switch(input$stability_subtype,
+                                                                "New Model" = "replication_stability_summary$new_model",
+                                                                "Bootstrap Models" = "replication_stability_summary$boot_models"),
+                               "Statistical Stability" = "statistical_stability_summary",
+                               "Stability under Data Selection" = switch(input$stability_subtype,
+                                                                         "Bootstrap Model" = "data_selection_stability_summary$bootstrap_model",
+                                                                         "No Outlier Model" = "data_selection_stability_summary$no_outlier_model",
+                                                                         "Strata Bootstrap Model" = "data_selection_stability_summary$strata_boot_model"),
+                               "Stability under Model Selection" = "model_selection_stability_summary",
+                               "Numerical Stability" = "numerical_stability_summary",
+                               "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_summary",
+                               "Stability under Selection of Technique" = "technique_stability_summary")
+        summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
+        if (is_list_of_dataframes(summary)) {
+          lapply(names(summary), function(name) {
+            output[[name]] <- DT::renderDataTable({summary[[name]]})
+            })
+          } else {
+            output$single_summary <- DT::renderDataTable({summary})
+            }
+        }, error = function(e) {
+          message("Error in observe: ", e)
+          })
+      })
+
+    # A dynamic UI that generates a table for each tibble in the selected summary
+    output$summary_table <- shiny::renderUI({
       shiny::req(stability_results())
       summary_type <- switch(input$stability_type,
                              "Replication Stability" = switch(input$stability_subtype,
@@ -77,7 +112,12 @@ stability_app <- function(){
                              "Numerical Stability" = "numerical_stability_summary",
                              "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_summary",
                              "Stability under Selection of Technique" = "technique_stability_summary")
-      eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
+      summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
+      if (is_list_of_dataframes(summary)) {
+        lapply(names(summary), DT::dataTableOutput)
+      } else {
+        DT::dataTableOutput("single_summary")
+      }
     })
 
     output$stability_plot <- shiny::renderPlot({
@@ -105,5 +145,4 @@ stability_app <- function(){
   }
 
   shiny::shinyApp(ui, server)
-
 }
