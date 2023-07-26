@@ -14,6 +14,7 @@ BugReports: https://github.com/mightymetrika/gifistab/issues
 Imports: 
     broom,
     dplyr,
+    DT,
     ggplot2,
     lmtest,
     MASS,

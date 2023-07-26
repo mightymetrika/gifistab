@@ -11,8 +11,8 @@ summary_analytic_and_algebraic_stability(obj)
 function, containing the L1 norm and Linf norm condition numbers of the model.}
 }
 \value{
-The function directly returns the input argument \code{obj}, which is a list
-containing the L1 norm and Linf norm condition numbers of the model.
+The function returns a data frame with the L1 norm and Linf norm
+condition numbers of the model.
 }
 \description{
 This function provides the summary for the analytic and algebraic stability
