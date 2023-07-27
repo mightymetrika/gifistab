@@ -25,7 +25,8 @@ stability_app <- function(){
       shiny::uiOutput("main_summary_table"),
       shiny::tableOutput("summary_table"),
       shiny::plotOutput("stability_plot"),
-      shiny::uiOutput("explanation")
+      shiny::uiOutput("explanation"),
+      shiny::uiOutput("references")
     )
   )
 
@@ -192,6 +193,17 @@ stability_app <- function(){
       )
 
       shiny::HTML(html_text)
+    })
+
+    output$references <- shiny::renderUI({
+      shiny::req(stability_results())
+      shiny::HTML("
+    <h3>References</h3>
+    <ul>
+      <li>Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. <a href='https://escholarship.org/uc/item/0789f7d3'>https://escholarship.org/uc/item/0789f7d3</a></li>
+      <!-- Add additional references here -->
+    </ul>
+  ")
     })
   }
 
