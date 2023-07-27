@@ -1,5 +1,6 @@
 stability_app <- function(){
   ui <- shiny::fluidPage(
+    shinyjs::useShinyjs(),
     shiny::column(
       width = 4,
       shiny::h3("Argument Specification"),
@@ -20,10 +21,11 @@ stability_app <- function(){
     ),
     shiny::column(
       width = 8,
+      shiny::uiOutput("summary_title"),  #UI output for the title and subtitle
       shiny::uiOutput("main_summary_table"),
       shiny::tableOutput("summary_table"),
       shiny::plotOutput("stability_plot"),
-      shiny::verbatimTextOutput("explanation")
+      shiny::uiOutput("explanation")
     )
   )
 
@@ -69,7 +71,7 @@ stability_app <- function(){
       if (!is.null(stability_subtypes[[input$stability_type]])) {
         shiny::selectInput("stability_subtype", "Choose Subtype (If Applicable):", choices = stability_subtypes[[input$stability_type]])
       } else {
-        NULL
+        shinyjs::hidden(shiny::textInput("stability_subtype", NULL))  # Reset the subtype value to NULL when it's not applicable
       }
     })
 
@@ -82,6 +84,14 @@ stability_app <- function(){
       family <- if (input$model_type == "glm") get(input$family)() else NULL
       stability_assessment(data, formula, engine, new_data = new_data, nboot = input$nboot, variable_to_remove = input$variable_to_remove, variable_of_interest = input$variable_of_interest, family = family)
     }, ignoreNULL = FALSE)
+
+    # Server code to render the title and subtitle
+    output$summary_title <- shiny::renderUI({
+      shiny::req(stability_results())
+      title <- input$stability_type
+      subtitle <- if (!is.null(stability_subtypes[[input$stability_type]]) && !is.null(input$stability_subtype)) paste(": ", input$stability_subtype) else ""
+      shiny::tags$h2(paste0(title, subtitle))
+    })
 
     output$main_summary <- DT::renderDataTable({
       shiny::req(stability_results())
@@ -131,14 +141,20 @@ stability_app <- function(){
       if (is_list_of_dataframes(summary)) {
         do.call(shiny::tagList, lapply(names(summary), function(name) {
           list(
-            shiny::h3(tools::toTitleCase(gsub("_", " ", name))),
+            shiny::h3(tools::toTitleCase(gsub("summary", "", gsub("_", " ", name)))),
             DT::dataTableOutput(name)
           )
         }))
       } else {
-        single_summary_title <- unlist(strsplit(summary_type, "\\$"))[2]
+        # Check if there's a second element in the summary_type string
+        summary_type_split <- unlist(strsplit(summary_type, "\\$"))
+        if (length(summary_type_split) > 1) {
+          single_summary_title <- summary_type_split[2]
+        } else {
+          single_summary_title <- summary_type_split[1]
+        }
         list(
-          shiny::h3(tools::toTitleCase(gsub("_", " ", single_summary_title))),
+          shiny::h3(tools::toTitleCase(gsub("summary", "", gsub("_", " ", single_summary_title)))),
           DT::dataTableOutput("single_summary")
         )
       }
@@ -162,9 +178,20 @@ stability_app <- function(){
       print(eval(parse(text = paste0("stability_results()$gstab_plot$", plot_type))))
     })
 
-    output$explanation <- shiny::renderPrint({
+    output$explanation <- shiny::renderUI({
       shiny::req(stability_results())
-      stability_results()$gstab_explainer[[input$stability_type]]
+      explanation <- stability_results()$gstab_explainer[[input$stability_type]]
+
+      html_text <- paste0(
+        "<h3>Definition</h3>",
+        "<p>", explanation$definition, "</p>",
+        "<h3>Explanation</h3>",
+        "<p>", explanation$explanation, "</p>",
+        "<h3>Interpretation</h3>",
+        "<p>", explanation$interpretation, "</p>"
+      )
+
+      shiny::HTML(html_text)
     })
   }
 
