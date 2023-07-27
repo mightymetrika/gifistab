@@ -19,7 +19,7 @@ stability_app <- function(){
     ),
     shiny::column(
       width = 8,
-      shiny::tableOutput("main_summary"),
+      DT::dataTableOutput("main_summary"),
       shiny::tableOutput("summary_table"),
       shiny::plotOutput("stability_plot"),
       shiny::verbatimTextOutput("explanation")
@@ -57,9 +57,11 @@ stability_app <- function(){
       stability_assessment(data, formula, engine, new_data = new_data, nboot = input$nboot, variable_to_remove = input$variable_to_remove, variable_of_interest = input$variable_of_interest, family = family)
     }, ignoreNULL = FALSE)
 
-    output$main_summary <- shiny::renderTable({
+    output$main_summary <- DT::renderDataTable({
       shiny::req(stability_results())
-      stability_results()$gstab_summary$original_summary
+      summary <- stability_results()$gstab_summary$original_summary
+      numeric_cols <- which(sapply(summary, is.numeric))
+      DT::datatable(summary) |> DT::formatRound(columns = numeric_cols, digits = 3)
     })
 
     is_list_of_dataframes <- function(x) {
@@ -86,10 +88,16 @@ stability_app <- function(){
         summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
         if (is_list_of_dataframes(summary)) {
           lapply(names(summary), function(name) {
-            output[[name]] <- DT::renderDataTable({summary[[name]]})
+            output[[name]] <- DT::renderDataTable({
+              numeric_cols <- which(sapply(summary[[name]], is.numeric))
+              DT::datatable(summary[[name]]) |> DT::formatRound(columns = numeric_cols, digits = 3)
+            })
             })
           } else {
-            output$single_summary <- DT::renderDataTable({summary})
+            output$single_summary <- DT::renderDataTable({
+              numeric_cols <- which(sapply(summary, is.numeric))
+              DT::datatable(summary) |> DT::formatRound(columns = numeric_cols, digits = 3)
+            })
             }
         }, error = function(e) {
           message("Error in observe: ", e)
