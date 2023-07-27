@@ -2,6 +2,7 @@ stability_app <- function(){
   ui <- shiny::fluidPage(
     shiny::column(
       width = 4,
+      shiny::h3("Argument Specification"),
       shiny::fileInput("datafile", "Choose CSV File", accept = c(".csv")),
       shiny::fileInput("newdatafile", "Choose New CSV File (Optional)", accept = c(".csv")),
       shiny::textInput("formula", "Enter the formula (e.g., y ~ x1 + x2)"),
@@ -19,6 +20,7 @@ stability_app <- function(){
     ),
     shiny::column(
       width = 8,
+      shiny::h3("Main Model"),
       DT::dataTableOutput("main_summary"),
       shiny::tableOutput("summary_table"),
       shiny::plotOutput("stability_plot"),
@@ -92,19 +94,18 @@ stability_app <- function(){
               numeric_cols <- which(sapply(summary[[name]], is.numeric))
               DT::datatable(summary[[name]]) |> DT::formatRound(columns = numeric_cols, digits = 3)
             })
-            })
-          } else {
-            output$single_summary <- DT::renderDataTable({
-              numeric_cols <- which(sapply(summary, is.numeric))
-              DT::datatable(summary) |> DT::formatRound(columns = numeric_cols, digits = 3)
-            })
-            }
-        }, error = function(e) {
-          message("Error in observe: ", e)
           })
+        } else {
+          output$single_summary <- DT::renderDataTable({
+            numeric_cols <- which(sapply(summary, is.numeric))
+            DT::datatable(summary) |> DT::formatRound(columns = numeric_cols, digits = 3)
+          })
+        }
+      }, error = function(e) {
+        message("Error in observe: ", e)
       })
+    })
 
-    # A dynamic UI that generates a table for each tibble in the selected summary
     output$summary_table <- shiny::renderUI({
       shiny::req(stability_results())
       summary_type <- switch(input$stability_type,
@@ -122,9 +123,18 @@ stability_app <- function(){
                              "Stability under Selection of Technique" = "technique_stability_summary")
       summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
       if (is_list_of_dataframes(summary)) {
-        lapply(names(summary), DT::dataTableOutput)
+        do.call(shiny::tagList, lapply(names(summary), function(name) {
+          list(
+            shiny::h3(tools::toTitleCase(gsub("_", " ", name))),
+            DT::dataTableOutput(name)
+          )
+        }))
       } else {
-        DT::dataTableOutput("single_summary")
+        single_summary_title <- unlist(strsplit(summary_type, "\\$"))[2]
+        list(
+          shiny::h3(tools::toTitleCase(gsub("_", " ", single_summary_title))),
+          DT::dataTableOutput("single_summary")
+        )
       }
     })
 
