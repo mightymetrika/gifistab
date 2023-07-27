@@ -19,7 +19,8 @@ Imports:
     lmtest,
     MASS,
     robustbase,
-    shiny
+    shiny,
+    shinyjs
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
