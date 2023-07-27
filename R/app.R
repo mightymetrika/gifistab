@@ -1,9 +1,10 @@
 stability_app <- function(){
   ui <- shiny::fluidPage(
+    theme = shinythemes::shinytheme("spacelab"),
     shinyjs::useShinyjs(),
     shiny::column(
       width = 4,
-      shiny::h3("Argument Specification"),
+      shiny::h3("Arguments"),
       shiny::fileInput("datafile", "Choose CSV File", accept = c(".csv")),
       shiny::fileInput("newdatafile", "Choose New CSV File (Optional)", accept = c(".csv")),
       shiny::textInput("formula", "Enter the formula (e.g., y ~ x1 + x2)"),
@@ -16,6 +17,8 @@ stability_app <- function(){
       shiny::textInput("variable_to_remove", "Variable to Remove (Optional)"),
       shiny::textInput("variable_of_interest", "Variable of Interest (Optional)"),
       shiny::actionButton("go", "Perform Stability Assessment"),
+      shiny::br(),  # Add a line break
+      shiny::br(),  # Add a line break
       shiny::selectInput("stability_type", "Choose Stability Assessment Type:", choices = c("Replication Stability", "Statistical Stability", "Stability under Data Selection", "Stability under Model Selection", "Numerical Stability", "Analytic and Algebraic Stability", "Stability under Selection of Technique")),
       shiny::uiOutput("subtype_select")  # Create UI output for subtype selection
     ),
@@ -24,6 +27,8 @@ stability_app <- function(){
       shiny::uiOutput("summary_title"),  #UI output for the title and subtitle
       shiny::uiOutput("main_summary_table"),
       shiny::tableOutput("summary_table"),
+      shiny::br(),  # Add a line break
+      shiny::br(),  # Add a line break
       shiny::plotOutput("stability_plot"),
       shiny::uiOutput("explanation"),
       shiny::uiOutput("references")
