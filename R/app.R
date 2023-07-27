@@ -20,8 +20,7 @@ stability_app <- function(){
     ),
     shiny::column(
       width = 8,
-      shiny::h3("Main Model"),
-      DT::dataTableOutput("main_summary"),
+      shiny::uiOutput("main_summary_table"),
       shiny::tableOutput("summary_table"),
       shiny::plotOutput("stability_plot"),
       shiny::verbatimTextOutput("explanation")
@@ -39,6 +38,31 @@ stability_app <- function(){
       "Analytic and Algebraic Stability" = NULL,
       "Stability under Selection of Technique" = NULL
     )
+
+    # Function to get the stability summary type
+    get_summary_type <- function(input) {
+      switch(input$stability_type,
+             "Replication Stability" = switch(input$stability_subtype,
+                                              "New Model" = "replication_stability_summary$new_model",
+                                              "Bootstrap Models" = "replication_stability_summary$boot_models"),
+             "Statistical Stability" = "statistical_stability_summary",
+             "Stability under Data Selection" = switch(input$stability_subtype,
+                                                       "Bootstrap Model" = "data_selection_stability_summary$bootstrap_model",
+                                                       "No Outlier Model" = "data_selection_stability_summary$no_outlier_model",
+                                                       "Strata Bootstrap Model" = "data_selection_stability_summary$strata_boot_model"),
+             "Stability under Model Selection" = "model_selection_stability_summary",
+             "Numerical Stability" = "numerical_stability_summary",
+             "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_summary",
+             "Stability under Selection of Technique" = "technique_stability_summary")
+    }
+
+    # Function to render DataTable
+    render_data_table <- function(name, data) {
+      output[[name]] <- DT::renderDataTable({
+        numeric_cols <- which(sapply(data, is.numeric))
+        DT::datatable(data) |> DT::formatRound(columns = numeric_cols, digits = 3)
+      })
+    }
 
     # Update the choices of the subtype input when the type input changes
     output$subtype_select <- shiny::renderUI({
@@ -66,6 +90,18 @@ stability_app <- function(){
       DT::datatable(summary) |> DT::formatRound(columns = numeric_cols, digits = 3)
     })
 
+    output$main_summary_table <- shiny::renderUI({
+      shiny::req(stability_results())
+      if (!is.null(stability_results()$gstab_summary$original_summary)) {
+        list(
+          shiny::h3("Main Model"),
+          DT::dataTableOutput("main_summary")
+        )
+      } else {
+        NULL
+      }
+    })
+
     is_list_of_dataframes <- function(x) {
       is.list(x) && all(sapply(x, function(y) inherits(y, "data.frame")))
     }
@@ -74,32 +110,14 @@ stability_app <- function(){
     shiny::observe({
       tryCatch({
         shiny::req(stability_results())
-        summary_type <- switch(input$stability_type,
-                               "Replication Stability" = switch(input$stability_subtype,
-                                                                "New Model" = "replication_stability_summary$new_model",
-                                                                "Bootstrap Models" = "replication_stability_summary$boot_models"),
-                               "Statistical Stability" = "statistical_stability_summary",
-                               "Stability under Data Selection" = switch(input$stability_subtype,
-                                                                         "Bootstrap Model" = "data_selection_stability_summary$bootstrap_model",
-                                                                         "No Outlier Model" = "data_selection_stability_summary$no_outlier_model",
-                                                                         "Strata Bootstrap Model" = "data_selection_stability_summary$strata_boot_model"),
-                               "Stability under Model Selection" = "model_selection_stability_summary",
-                               "Numerical Stability" = "numerical_stability_summary",
-                               "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_summary",
-                               "Stability under Selection of Technique" = "technique_stability_summary")
+        summary_type <- get_summary_type(input)
         summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
         if (is_list_of_dataframes(summary)) {
           lapply(names(summary), function(name) {
-            output[[name]] <- DT::renderDataTable({
-              numeric_cols <- which(sapply(summary[[name]], is.numeric))
-              DT::datatable(summary[[name]]) |> DT::formatRound(columns = numeric_cols, digits = 3)
-            })
+            render_data_table(name, summary[[name]])
           })
         } else {
-          output$single_summary <- DT::renderDataTable({
-            numeric_cols <- which(sapply(summary, is.numeric))
-            DT::datatable(summary) |> DT::formatRound(columns = numeric_cols, digits = 3)
-          })
+          render_data_table("single_summary", summary)
         }
       }, error = function(e) {
         message("Error in observe: ", e)
@@ -108,19 +126,7 @@ stability_app <- function(){
 
     output$summary_table <- shiny::renderUI({
       shiny::req(stability_results())
-      summary_type <- switch(input$stability_type,
-                             "Replication Stability" = switch(input$stability_subtype,
-                                                              "New Model" = "replication_stability_summary$new_model",
-                                                              "Bootstrap Models" = "replication_stability_summary$boot_models"),
-                             "Statistical Stability" = "statistical_stability_summary",
-                             "Stability under Data Selection" = switch(input$stability_subtype,
-                                                                       "Bootstrap Model" = "data_selection_stability_summary$bootstrap_model",
-                                                                       "No Outlier Model" = "data_selection_stability_summary$no_outlier_model",
-                                                                       "Strata Bootstrap Model" = "data_selection_stability_summary$strata_boot_model"),
-                             "Stability under Model Selection" = "model_selection_stability_summary",
-                             "Numerical Stability" = "numerical_stability_summary",
-                             "Analytic and Algebraic Stability" = "analytic_and_algebraic_stability_summary",
-                             "Stability under Selection of Technique" = "technique_stability_summary")
+      summary_type <- get_summary_type(input)
       summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
       if (is_list_of_dataframes(summary)) {
         do.call(shiny::tagList, lapply(names(summary), function(name) {
