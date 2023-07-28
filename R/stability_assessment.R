@@ -24,6 +24,9 @@
 #' the summary. Defaults to TRUE.
 #' @param conf.level Confidence level for confidence interval when conf.int is
 #' TRUE. Defaults to 0.95.
+#' @param seed An optional integer that sets the seed for the random number
+#' generator in order to obtain reproducible results. If NULL (default), the
+#' random number generation will not be reproducible.
 #' @param ... Additional arguments to be passed to the `engine` function.
 #'
 #' @return A list containing the results of the stability assessment. The list
@@ -43,7 +46,13 @@
 stability_assessment <- function(data, formula, engine, new_data = NULL,
                                  nboot = NULL, variable_to_remove = NULL,
                                  variable_of_interest = NULL,
-                                 conf.int = TRUE, conf.level = 0.95, ...) {
+                                 conf.int = TRUE, conf.level = 0.95, seed = NULL,
+                                 ...) {
+  # Set random number seed
+  if (!is.null(seed)) {
+    set.seed(seed)
+  }
+
   # Fit the model using the specified engine and arguments
   fit_model <- do.call(engine, c(list(formula, data = data), list(...)))
 

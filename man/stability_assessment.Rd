@@ -14,6 +14,7 @@ stability_assessment(
   variable_of_interest = NULL,
   conf.int = TRUE,
   conf.level = 0.95,
+  seed = NULL,
   ...
 )
 }
@@ -43,6 +44,10 @@ the summary. Defaults to TRUE.}
 
 \item{conf.level}{Confidence level for confidence interval when conf.int is
 TRUE. Defaults to 0.95.}
+
+\item{seed}{An optional integer that sets the seed for the random number
+generator in order to obtain reproducible results. If NULL (default), the
+random number generation will not be reproducible.}
 
 \item{...}{Additional arguments to be passed to the \code{engine} function.}
 }
