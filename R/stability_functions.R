@@ -167,6 +167,8 @@ statistical_stability <- function(model, data, formula, nf = 0.05, ...) {
 #'
 #' @keywords internal
 stability_under_data_selection <- function(model, data, formula, ...) {
+
+  # Single resample bootstap model
   bootstrap_data <- data[sample(nrow(data), nrow(data), replace = TRUE), ]
   fit_model <- fit_model_func(model)
   bootstrap_model <- fit_model(formula, data = bootstrap_data, ...)
@@ -189,7 +191,12 @@ stability_under_data_selection <- function(model, data, formula, ...) {
     }
   })
 
-  strata <- sample(rep(1:3, nrow(data) / 3))
+  # Stratified bootstrap models
+  num_rows <- nrow(data)
+  num_strata <- 3
+  strata_size <- num_rows %/% num_strata
+  remaining <- num_rows %% num_strata
+  strata <- sample(c(rep(1:num_strata, each = strata_size), sample(1:num_strata, size = remaining)))
   strata_boot_models <- lapply(1:3, function(x) {
     data_subset <- data[strata == x, ]
     boot_subset <- data_subset[sample(nrow(data_subset), nrow(data), replace = TRUE), ]
@@ -292,7 +299,8 @@ stability_under_model_selection <- function(model, data, formula, variable_to_re
     # Perform backward selection, but keep the lower model in the scope
     new_model <- MASS::stepAIC(full_model,
                                direction = "backward",
-                               scope = list(lower = lower_formula, upper = formula))
+                               scope = list(lower = lower_formula, upper = formula),
+                               trace = FALSE)
 
     # Perform likelihood ratio test
     remove_least_useful <- lmtest::lrtest(full_model, new_model)
