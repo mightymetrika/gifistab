@@ -70,8 +70,10 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
   }
 
   # Check that nboot is a single integer, if provided
-  if (!is.null(nboot) && (!is.numeric(nboot) || length(nboot) != 1 || nboot != floor(nboot))) {
-    stop("nboot must be a single integer.")
+  if (!is.null(nboot)) {
+    if (!is.numeric(nboot) || length(nboot) != 1 || nboot != floor(nboot)) {
+      stop("nboot must be a single integer.")
+    }
   }
 
   # Check that variable_to_remove is a character string, if provided
@@ -95,8 +97,10 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
   }
 
   # Check that seed is a single integer, if provided
-  if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1 || seed != floor(seed))) {
-    stop("seed must be a single integer.")
+  if (!is.null(seed)) {
+    if (!is.numeric(seed) || length(seed) != 1 || seed != floor(seed)) {
+      stop("seed must be a single integer.")
+    }
   }
 
   # Set random number seed

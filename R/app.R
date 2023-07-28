@@ -31,10 +31,10 @@ stability_app <- function(){
         condition = "input.model_type == 'glm'",
         shiny::selectInput("family", "Choose Family:", choices = c("binomial", "gaussian", "poisson", "Gamma", "inverse.gaussian", "quasipoisson", "quasibinomial"))
       ),
-      shiny::numericInput("nboot", "Number of Bootstrap Resamples (Optional)", value = NULL, min = 1, max = 10000),
+      shiny::numericInput("nboot", "Number of Bootstrap Resamples (Optional)", value = NA, min = 1, max = 10000),
       shiny::textInput("variable_to_remove", "Variable to Remove (Optional)"),
       shiny::textInput("variable_of_interest", "Variable of Interest (Optional)"),
-      shiny::numericInput("seed", "Random Number Seed (Optional for Reproducibility)", value = NULL, min = 1, max = .Machine$integer.max),
+      shiny::numericInput("seed", "Random Number Seed (Optional for Reproducibility)", value = NA, min = 1, max = .Machine$integer.max),
       shiny::actionButton("go", "Perform Stability Assessment"),
       shiny::br(),  # Add a line break
       shiny::br(),  # Add a line break
@@ -100,14 +100,28 @@ stability_app <- function(){
       }
     })
 
+    # stability_results <- shiny::eventReactive(input$go, {
+    #   shiny::req(input$datafile)  # Ensure a file has been uploaded
+    #   data <- utils::read.csv(input$datafile$datapath)
+    #   new_data <- if (!is.null(input$newdatafile$datapath)) utils::read.csv(input$newdatafile$datapath) else NULL
+    #   formula <- stats::as.formula(input$formula)
+    #   engine <- if (input$model_type == "lm") stats::lm else stats::glm
+    #   family <- if (input$model_type == "glm") get(input$family)() else NULL
+    #   stability_assessment(data, formula, engine, new_data = new_data, nboot = input$nboot, variable_to_remove = input$variable_to_remove, variable_of_interest = input$variable_of_interest, family = family, seed = input$seed)
+    # }, ignoreNULL = FALSE)
     stability_results <- shiny::eventReactive(input$go, {
       shiny::req(input$datafile)  # Ensure a file has been uploaded
       data <- utils::read.csv(input$datafile$datapath)
       new_data <- if (!is.null(input$newdatafile$datapath)) utils::read.csv(input$newdatafile$datapath) else NULL
-      formula <- stats::as.formula(input$formula)
+      formula <- if (!is.null(input$formula) && nzchar(input$formula)) stats::as.formula(input$formula) else NULL
       engine <- if (input$model_type == "lm") stats::lm else stats::glm
-      family <- if (input$model_type == "glm") get(input$family)() else NULL
-      stability_assessment(data, formula, engine, new_data = new_data, nboot = input$nboot, variable_to_remove = input$variable_to_remove, variable_of_interest = input$variable_of_interest, family = family, seed = input$seed)
+      family <- if (input$model_type == "glm" && !is.null(input$family) && nzchar(input$family)) get(input$family)() else NULL
+      nboot <- if (!is.na(input$nboot)) input$nboot else NULL
+      variable_to_remove <- if (!is.null(input$variable_to_remove) && nzchar(input$variable_to_remove)) input$variable_to_remove else NULL
+      variable_of_interest <- if (!is.null(input$variable_of_interest) && nzchar(input$variable_of_interest)) input$variable_of_interest else NULL
+      seed <- if (!is.na(input$seed)) input$seed else NULL
+
+      stability_assessment(data, formula, engine, new_data = new_data, nboot = nboot, variable_to_remove = variable_to_remove, variable_of_interest = variable_of_interest, family = family, seed = seed)
     }, ignoreNULL = FALSE)
 
     # Server code to render the title and subtitle

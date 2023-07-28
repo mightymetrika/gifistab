@@ -67,19 +67,6 @@ stab_explainer.gstab_lm <- function(object) {
 
       In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when applied to different samples of data with different noise levels."
     ),
-    # "Stability under Data Selection" = list(
-    #   definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis. The former corresponds to rejection of outliers and resampling techniques. In this framework, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new data set (Michailides and de Leeuw, 1998).",
-    #   explanation = "The stability under data selection function in the 'gifistab' package implements this definition by fitting the original model on three sets of data:
-    #
-    #   Resampled data, which is created by sampling the original data with replacement. This ensures that the resampled data has the same sample size as the original data and that the samples are drawn from the same population, but the observations are not necessarily the same.
-    #
-    #   Data with outliers removed, which is created by using robust multivariate Mahalanobis distances; if outlier identification using  robust multivariate Mahalanobis distances fails, then observations will be identified as outliers if the observation is 3 standard deviations away from the mean on any of the variables in the data. Outliers are removed from the data and the model is refitted.
-    #
-    #   Stratified bootstrap data, which is created by first creating three random subsamples of the data where each observation belongs to one and only one subsample.  Subsamples are then used to create bootstrap samples of the same sample size as the original data. This ensures that the bootstrap samples are representative of the distribution of the data in the original data set.",
-    #   interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with resampled data, with outliers removed, and with stratified bootstrap data, then the model is considered to be stable under data selection. However, if there are significant differences between the original model and the models fitted with resampled data, with outliers removed, or with stratified bootstrap data, then the model may not be stable under data selection.
-    #
-    #   In general, a model with good stability under data selection is less likely to be affected by outliers or sampling variability."
-    # ),
     "Stability under Data Selection" = list(
       definition = "This involves considering variations in the data by either omitting objects from the dataset or excluding variables from the subsequent analysis. This can correspond to the rejection of outliers and the application of resampling techniques. In this context, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new dataset (Michailides and de Leeuw, 1998).",
       explanation = "The 'gifistab' package's stability under data selection function implements this definition by fitting the original model on three different datasets:
