@@ -48,6 +48,57 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
                                  variable_of_interest = NULL,
                                  conf.int = TRUE, conf.level = 0.95, seed = NULL,
                                  ...) {
+
+  # Check that data is a data frame
+  if (!is.data.frame(data)) {
+    stop("data must be a data frame.")
+  }
+
+  # Check that formula is a formula
+  if (!inherits(formula, "formula")) {
+    stop("formula must be a formula object.")
+  }
+
+  # Check that engine is a function
+  if (!is.function(engine)) {
+    stop("engine must be a function.")
+  }
+
+  # Check that new_data is a data frame, if provided
+  if (!is.null(new_data) && !is.data.frame(new_data)) {
+    stop("new_data must be a data frame.")
+  }
+
+  # Check that nboot is a single integer, if provided
+  if (!is.null(nboot) && (!is.numeric(nboot) || length(nboot) != 1 || nboot != floor(nboot))) {
+    stop("nboot must be a single integer.")
+  }
+
+  # Check that variable_to_remove is a character string, if provided
+  if (!is.null(variable_to_remove) && !is.character(variable_to_remove)) {
+    stop("variable_to_remove must be a character string.")
+  }
+
+  # Check that variable_of_interest is a character string, if provided
+  if (!is.null(variable_of_interest) && !is.character(variable_of_interest)) {
+    stop("variable_of_interest must be a character string.")
+  }
+
+  # Check that conf.int is a logical value
+  if (!is.logical(conf.int) || length(conf.int) != 1) {
+    stop("conf.int must be a logical value.")
+  }
+
+  # Check that conf.level is a numeric value between 0 and 1
+  if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level <= 0 || conf.level >= 1) {
+    stop("conf.level must be a numeric value between 0 and 1.")
+  }
+
+  # Check that seed is a single integer, if provided
+  if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1 || seed != floor(seed))) {
+    stop("seed must be a single integer.")
+  }
+
   # Set random number seed
   if (!is.null(seed)) {
     set.seed(seed)
