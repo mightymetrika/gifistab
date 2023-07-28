@@ -28,42 +28,30 @@ stab_explainer.gstab_lm <- function(object) {
   stability_definitions <- list(
     "Reference" = "Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. https://escholarship.org/uc/item/0789f7d3",
     "Replication Stability" = list(
-      definition = "If a new data set is sampled and apply the same technique to this new set, then the results should not change dramatically (Michailides and de Leeuw, 1998).",
-      explanation = "The replication stability function in the 'gifistab' package implements this definition by fitting the original model on a new data set (if provided) and also running bootstrap resampling (if specified). This helps to assess the stability of the model across different samples.
+      definition = "Replication stability suggests that applying the same technique to a new dataset sampled from the same population should not dramatically change the results (Michailides and de Leeuw, 1998).",
+      explanation = "The 'gifistab' package's replication stability function achieves this by fitting the original model to a new dataset (if provided) and by conducting bootstrap resampling (if specified). These operations help evaluate the model's stability across different samples.
 
-      The new data set should be a sample drawn from the same population as the main original sample and the sample size should be similar as well.
+      The new dataset should be sampled from the same population as the original and should have a similar sample size.
 
-      The bootstrap resampling procedure involves fitting the model on a series of bootstrap samples. Each bootstrap sample is created by sampling the original data with replacement. This ensures that the bootstrap samples are representative of the original data set.
+      The bootstrap resampling procedure fits the model to a series of bootstrap samples, each created by sampling the original data with replacement.
 
-      The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the new model and the bootstrap models. Significant differences between the original model and the new model or the bootstrap models may suggest a lack of replication stability.",
-      interpretation = "The replication stability results can be used to assess the stability of the model across different samples. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the new model and the bootstrap models, then the model is considered to be replication stable. However, if there are significant differences between the original model and the new model or the bootstrap models, then the model may not be replication stable.
+      The coefficients, standard errors, and p-values of the original model are compared to those of the new model and the bootstrap models. Significant differences between the original model and the new model or the bootstrap models may suggest a lack of replication stability.
 
-      In general, a model with good replication stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data."
+      The `boot_mean_df` output provides the average estimate, standard error, and optionally, the confidence interval for each term in the model, averaged over all bootstrap samples. This offers a measure of the central tendency of each term's estimate and standard error across bootstrap samples.
+
+      Additionally, `boot_mean_df` includes the proportion of bootstrap samples where the term's p-value was below 0.05, indicating statistical significance at the 0.05 alpha level. This represents the frequency of statistically significant results for each term across the bootstrap samples.
+
+      The `boot_sd_df` output provides the standard deviation of the estimate and standard error for each term in the model, computed across all bootstrap samples. This offers a measure of the dispersion or variability of each term's estimate and standard error across the bootstrap samples.",
+      interpretation = "The replication stability results can be used to assess the stability of the model across different samples. If the coefficients and standard errors of the original model are similar to those of the new model and the bootstrap models, the model is considered to be replication stable. Likewise, if the p-values of the original model are similar to the p-value of the new model and the proportion of statistically significant results from the bootstrap models, the model is also considered replication stable. Significant differences, however, may suggest a lack of replication stability.
+
+      Generally, a model with good replication stability is less likely to be influenced by random variations in the data. This implies that the model is more likely to produce consistent results when applied to different data samples from the same population.
+
+      The `boot_mean_df` and `boot_sd_df` outputs provide additional insights about the model's stability across bootstrap samples. Small standard deviations in the `boot_sd_df` output suggest that the estimates and standard errors for each term are stable across bootstrap samples. Conversely, large standard deviations might indicate high variability across bootstrap samples, suggesting a potential lack of stability.
+
+      The `boot_mean_df` output can be used to compare the central tendency of each term's estimate and standard error across bootstrap samples to the corresponding values from the original model. Significant differences may indicate a potential lack of stability.
+
+      Moreover, the proportion of statistically significant results in the `boot_mean_df` output reflects the general trend of statistical significance across bootstrap samples. A high proportion suggests that the term is often statistically significant, while a low proportion suggests that the term is rarely significant. This information can be used to assess the consistency of a term's significance in the model."
     ),
-    # "Statistical Stability" = list(
-    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
-    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with added random noise and with permuted noise. This measures the model's sensitivity to random variations in the data.
-    #
-    #   The random noise is added to the response variable in the data. This ensures that the noise is independent of the other variables in the data. The permuted noise is created by randomly shuffling the order of the noise values. This ensures that the noise is not correlated with the other variables in the data.
-    #
-    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with noisy data. Significant differences between the original model and the models fitted with noisy data may suggest a lack of statistical stability.",
-    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with noisy data, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with noisy data, then the model may not be statistically stable.
-    #
-    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
-    # ),
-    # "Statistical Stability" = list(
-    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
-    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
-    #
-    #   For non-binomial families, the function first transforms the response variable according to the model's family, and then adds normally distributed noise to the transformed response. The inverse of the transformation is then applied to the noisy response to get back to the original scale. For binomial families, a fraction of the response variable is randomly flipped (changed from 0 to 1 or from 1 to 0).
-    #
-    #   The permuted noise is created by randomly shuffling the order of the noise values and then adding the noise to the response variable. This ensures that the noise is not correlated with the other variables in the data.
-    #
-    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with a noisy response. Significant differences between the original model and the models fitted with added noise may suggest a lack of statistical stability.",
-    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with a noisy response, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with added noise, then the model may not be statistically stable.
-    #
-    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
-    # ),
     "Statistical Stability" = list(
       definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
       explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
@@ -79,16 +67,29 @@ stab_explainer.gstab_lm <- function(object) {
 
       In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when applied to different samples of data with different noise levels."
     ),
+    # "Stability under Data Selection" = list(
+    #   definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis. The former corresponds to rejection of outliers and resampling techniques. In this framework, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new data set (Michailides and de Leeuw, 1998).",
+    #   explanation = "The stability under data selection function in the 'gifistab' package implements this definition by fitting the original model on three sets of data:
+    #
+    #   Resampled data, which is created by sampling the original data with replacement. This ensures that the resampled data has the same sample size as the original data and that the samples are drawn from the same population, but the observations are not necessarily the same.
+    #
+    #   Data with outliers removed, which is created by using robust multivariate Mahalanobis distances; if outlier identification using  robust multivariate Mahalanobis distances fails, then observations will be identified as outliers if the observation is 3 standard deviations away from the mean on any of the variables in the data. Outliers are removed from the data and the model is refitted.
+    #
+    #   Stratified bootstrap data, which is created by first creating three random subsamples of the data where each observation belongs to one and only one subsample.  Subsamples are then used to create bootstrap samples of the same sample size as the original data. This ensures that the bootstrap samples are representative of the distribution of the data in the original data set.",
+    #   interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with resampled data, with outliers removed, and with stratified bootstrap data, then the model is considered to be stable under data selection. However, if there are significant differences between the original model and the models fitted with resampled data, with outliers removed, or with stratified bootstrap data, then the model may not be stable under data selection.
+    #
+    #   In general, a model with good stability under data selection is less likely to be affected by outliers or sampling variability."
+    # ),
     "Stability under Data Selection" = list(
-      definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis. The former corresponds to rejection of outliers and resampling techniques. In this framework, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new data set (Michailides and de Leeuw, 1998).",
-      explanation = "The stability under data selection function in the 'gifistab' package implements this definition by fitting the original model on three sets of data:
+      definition = "This involves considering variations in the data by either omitting objects from the dataset or excluding variables from the subsequent analysis. This can correspond to the rejection of outliers and the application of resampling techniques. In this context, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new dataset (Michailides and de Leeuw, 1998).",
+      explanation = "The 'gifistab' package's stability under data selection function implements this definition by fitting the original model on three different datasets:
 
-      Resampled data, which is created by sampling the original data with replacement. This ensures that the resampled data has the same sample size as the original data and that the samples are drawn from the same population, but the observations are not necessarily the same.
+      1. Bootstrap data, created by sampling the original data with replacement. This ensures that the bootstrap data has the same sample size as the original data.
 
-      Data with outliers removed, which is created by using robust multivariate Mahalanobis distances; if outlier identification using  robust multivariate Mahalanobis distances fails, then observations will be identified as outliers if the observation is 3 standard deviations away from the mean on any of the variables in the data. Outliers are removed from the data and the model is refitted.
+      2. Data with outliers removed, created by using robust multivariate Mahalanobis distances. If outlier identification using robust multivariate Mahalanobis distances fails, then an observation will be identified as an outlier if it is 3 standard deviations away from the mean on any of the variables in the data. Outliers are then removed from the data and the model is refitted.
 
-      Stratified bootstrap data, which is created by first creating three random subsamples of the data where each observation belongs to one and only one subsample.  Subsamples are then used to create bootstrap samples of the same sample size as the original data. This ensures that the bootstrap samples are representative of the distribution of the data in the original data set.",
-      interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with resampled data, with outliers removed, and with stratified bootstrap data, then the model is considered to be stable under data selection. However, if there are significant differences between the original model and the models fitted with resampled data, with outliers removed, or with stratified bootstrap data, then the model may not be stable under data selection.
+      3. Stratified bootstrap data, created by first dividing the data into three random subsamples where each observation belongs to one and only one subsample. These subsamples are then used to create bootstrap samples of the same sample size as the original data.",
+      interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted to the bootstrap data, the data with outliers removed, and the stratified bootstrap data, then the model is considered stable under data selection. However, if there are significant differences between the original model and the models fitted to the bootstrap data, the data with outliers removed, or the stratified bootstrap data, then the model may not be stable under data selection.
 
       In general, a model with good stability under data selection is less likely to be affected by outliers or sampling variability."
     ),
@@ -112,15 +113,6 @@ stab_explainer.gstab_lm <- function(object) {
       Once the data has been perturbed, the function fits the model again. The results of the two fits are then compared. If the results are similar, then the model is considered to be numerically stable. However, if the results are different, then the model may be numerically unstable.",
       interpretation = "The results of the numerical stability function can be used to assess the robustness of a model to rounding errors and limited precision computations. If the results of the function show that the model is numerically stable, then the model is considered to be robust. However, if the results of the function show that the model is not numerically stable, then the model may be sensitive to rounding errors and may not be a reliable predictor."
     ),
-    # "Analytic and Algebraic Stability" = list(
-    #   definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
-    #   explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
-    #
-    #   The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
-    #
-    #   A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
-    #   interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
-    # ),
     "Analytic and Algebraic Stability" = list(
       definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
       explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating two condition numbers (kappa): one based on the L1 norm and another based on the Linf norm of the model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
@@ -164,42 +156,30 @@ stab_explainer.gstab_glm <- function(object) {
   stability_definitions <- list(
     "Reference" = "Michailides, G., & de Leeuw, J. (1998). The Gifi system for nonlinear multivariate analysis. eScholarship, University of California, Los Angeles. https://escholarship.org/uc/item/0789f7d3",
     "Replication Stability" = list(
-      definition = "If a new data set is sampled and apply the same technique to this new set, then the results should not change dramatically (Michailides and de Leeuw, 1998).",
-      explanation = "The replication stability function in the 'gifistab' package implements this definition by fitting the original model on a new data set (if provided) and also running bootstrap resampling (if specified). This helps to assess the stability of the model across different samples.
+      definition = "Replication stability suggests that applying the same technique to a new dataset sampled from the same population should not dramatically change the results (Michailides and de Leeuw, 1998).",
+      explanation = "The 'gifistab' package's replication stability function achieves this by fitting the original model to a new dataset (if provided) and by conducting bootstrap resampling (if specified). These operations help evaluate the model's stability across different samples.
 
-      The new data set should be a sample drawn from the same population as the main original sample and the sample size should be similar as well.
+      The new dataset should be sampled from the same population as the original and should have a similar sample size.
 
-      The bootstrap resampling procedure involves fitting the model on a series of bootstrap samples. Each bootstrap sample is created by sampling the original data with replacement. This ensures that the bootstrap samples are representative of the original data set.
+      The bootstrap resampling procedure fits the model to a series of bootstrap samples, each created by sampling the original data with replacement.
 
-      The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the new model and the bootstrap models. Significant differences between the original model and the new model or the bootstrap models may suggest a lack of replication stability.",
-      interpretation = "The replication stability results can be used to assess the stability of the model across different samples. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the new model and the bootstrap models, then the model is considered to be replication stable. However, if there are significant differences between the original model and the new model or the bootstrap models, then the model may not be replication stable.
+      The coefficients, standard errors, and p-values of the original model are compared to those of the new model and the bootstrap models. Significant differences between the original model and the new model or the bootstrap models may suggest a lack of replication stability.
 
-      In general, a model with good replication stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data."
+      The `boot_mean_df` output provides the average estimate, standard error, and optionally, the confidence interval for each term in the model, averaged over all bootstrap samples. This offers a measure of the central tendency of each term's estimate and standard error across bootstrap samples.
+
+      Additionally, `boot_mean_df` includes the proportion of bootstrap samples where the term's p-value was below 0.05, indicating statistical significance at the 0.05 alpha level. This represents the frequency of statistically significant results for each term across the bootstrap samples.
+
+      The `boot_sd_df` output provides the standard deviation of the estimate and standard error for each term in the model, computed across all bootstrap samples. This offers a measure of the dispersion or variability of each term's estimate and standard error across the bootstrap samples.",
+      interpretation = "The replication stability results can be used to assess the stability of the model across different samples. If the coefficients and standard errors of the original model are similar to those of the new model and the bootstrap models, the model is considered to be replication stable. Likewise, if the p-values of the original model are similar to the p-value of the new model and the proportion of statistically significant results from the bootstrap models, the model is also considered replication stable. Significant differences, however, may suggest a lack of replication stability.
+
+      Generally, a model with good replication stability is less likely to be influenced by random variations in the data. This implies that the model is more likely to produce consistent results when applied to different data samples from the same population.
+
+      The `boot_mean_df` and `boot_sd_df` outputs provide additional insights about the model's stability across bootstrap samples. Small standard deviations in the `boot_sd_df` output suggest that the estimates and standard errors for each term are stable across bootstrap samples. Conversely, large standard deviations might indicate high variability across bootstrap samples, suggesting a potential lack of stability.
+
+      The `boot_mean_df` output can be used to compare the central tendency of each term's estimate and standard error across bootstrap samples to the corresponding values from the original model. Significant differences may indicate a potential lack of stability.
+
+      Moreover, the proportion of statistically significant results in the `boot_mean_df` output reflects the general trend of statistical significance across bootstrap samples. A high proportion suggests that the term is often statistically significant, while a low proportion suggests that the term is rarely significant. This information can be used to assess the consistency of a term's significance in the model."
     ),
-    # "Statistical Stability" = list(
-    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
-    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with added random noise and with permuted noise. This measures the model's sensitivity to random variations in the data.
-    #
-    #   The random noise is added to the response variable in the data. This ensures that the noise is independent of the other variables in the data. The permuted noise is created by randomly shuffling the order of the noise values. This ensures that the noise is not correlated with the other variables in the data.
-    #
-    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with noisy data. Significant differences between the original model and the models fitted with noisy data may suggest a lack of statistical stability.",
-    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with noisy data, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with noisy data, then the model may not be statistically stable.
-    #
-    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
-    # ),
-    # "Statistical Stability" = list(
-    #   definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
-    #   explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
-    #
-    #   For non-binomial families, the function first transforms the response variable according to the model's family, and then adds normally distributed noise to the transformed response. The inverse of the transformation is then applied to the noisy response to get back to the original scale. For binomial families, a fraction of the response variable is randomly flipped (changed from 0 to 1 or from 1 to 0).
-    #
-    #   The permuted noise is created by randomly shuffling the order of the noise values and then adding the noise to the response variable. This ensures that the noise is not correlated with the other variables in the data.
-    #
-    #   The coefficients, standard errors, and p-values of the original model are compared to the coefficients, standard errors, and p-values of the models fitted with a noisy response. Significant differences between the original model and the models fitted with added noise may suggest a lack of statistical stability.",
-    #   interpretation = "The statistical stability results can be used to assess the sensitivity of the model to random variations in the data. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with a noisy response, then the model is considered to be statistically stable. However, if there are significant differences between the original model and the models fitted with added noise, then the model may not be statistically stable.
-    #
-    #   In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when it is applied to different samples of data with different levels of noise."
-    # ),
     "Statistical Stability" = list(
       definition = "It refers to the stability of the analysis whenever no new data set is formally sampled (Michailides and de Leeuw, 1998).",
       explanation = "The statistical stability function in the 'gifistab' package implements this definition by fitting the original model on the data with random noise and with permuted noise added to the response variable while taking into consideration the family of the model (i.e., Gaussian, gamma, inverse Gaussian, Poisson, quasi-Poisson, binomial, quasi-binomial).
@@ -216,15 +196,15 @@ stab_explainer.gstab_glm <- function(object) {
       In general, a model with good statistical stability is less likely to be affected by random variations in the data. This means that the model is more likely to produce consistent results when applied to different samples of data with different noise levels."
     ),
     "Stability under Data Selection" = list(
-      definition = "Variations in the data are considered, by omitting either objects from the data set or variables from subsequent analysis (Michailides and de Leeuw, 1998).",
-      explanation = "The stability under data selection function in the 'gifistab' package implements this definition by fitting the original model on three sets of data:
+      definition = "This involves considering variations in the data by either omitting objects from the dataset or excluding variables from the subsequent analysis. This can correspond to the rejection of outliers and the application of resampling techniques. In this context, resampling techniques can be thought of as a form of replication stability, but without formally sampling a new dataset (Michailides and de Leeuw, 1998).",
+      explanation = "The 'gifistab' package's stability under data selection function implements this definition by fitting the original model on three different datasets:
 
-      Resampled data, which is created by sampling the original data with replacement. This ensures that the resampled data has the same sample size as the original data and that the samples are drawn from the same population, but the observations are not necessarily the same.
+      1. Bootstrap data, created by sampling the original data with replacement. This ensures that the bootstrap data has the same sample size as the original data.
 
-      Data with outliers removed, which is created by using robust multivariate Mahalanobis distances; if outlier identification using  robust multivariate Mahalanobis distances fails, then observations will be identified as outliers if the observation is 3 standard deviations away from the mean on any of the variables in the data. Outliers are removed from the data and the model is refitted.
+      2. Data with outliers removed, created by using robust multivariate Mahalanobis distances. If outlier identification using robust multivariate Mahalanobis distances fails, then an observation will be identified as an outlier if it is 3 standard deviations away from the mean on any of the variables in the data. Outliers are then removed from the data and the model is refitted.
 
-      Stratified bootstrap data, which is created by first creating three random subsamples of the data where each observation belongs to one and only one subsample.  Subsamples are then used to create bootstrap samples of the same sample size as the original data. This ensures that the bootstrap samples are representative of the distribution of the data in the original data set.",
-      interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted with resampled data, with outliers removed, and with stratified bootstrap data, then the model is considered to be stable under data selection. However, if there are significant differences between the original model and the models fitted with resampled data, with outliers removed, or with stratified bootstrap data, then the model may not be stable under data selection.
+      3. Stratified bootstrap data, created by first dividing the data into three random subsamples where each observation belongs to one and only one subsample. These subsamples are then used to create bootstrap samples of the same sample size as the original data.",
+      interpretation = "The stability under data selection results can be used to assess the sensitivity of the model to outliers and sampling variability. If the coefficients, standard errors, and p-values of the original model are similar to the coefficients, standard errors, and p-values of the models fitted to the bootstrap data, the data with outliers removed, and the stratified bootstrap data, then the model is considered stable under data selection. However, if there are significant differences between the original model and the models fitted to the bootstrap data, the data with outliers removed, or the stratified bootstrap data, then the model may not be stable under data selection.
 
       In general, a model with good stability under data selection is less likely to be affected by outliers or sampling variability."
     ),
@@ -242,15 +222,6 @@ stab_explainer.gstab_glm <- function(object) {
       Once the data has been perturbed, the function fits the model again. The results of the two fits are then compared. If the results are similar, then the model is considered to be numerically stable. However, if the results are different, then the model may be numerically unstable.",
       interpretation = "The results of the numerical stability function can be used to assess the robustness of a model to rounding errors and limited precision computations. If the results of the function show that the model is numerically stable, then the model is considered to be robust. However, if the results of the function show that the model is not numerically stable, then the model may be sensitive to rounding errors and may not be a reliable predictor."
     ),
-    # "Analytic and Algebraic Stability" = list(
-    #   definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
-    #   explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating the condition number (kappa) of the original model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.
-    #
-    #   The function works by first calculating the determinant of the model's covariance matrix. Then, it calculates the ratio of the largest to smallest eigenvalues of the covariance matrix. This ratio is the condition number.
-    #
-    #   A high condition number indicates that the model is sensitive to changes in the independent variables. This is because small changes in the independent variables can lead to large changes in the model coefficients. The function also prints a warning if the condition number is above 30. This is because a condition number of 30 is considered to be the threshold for severe multicollinearity.",
-    #   interpretation = "The results of the analytic and algebraic stability function can be used to assess the robustness of a model to multicollinearity. If the condition number is high, then the model may be unstable under slight changes in the independent variables. However, if the condition number is low, then the model is considered to be robust."
-    # ),
     "Analytic and Algebraic Stability" = list(
       definition = "If the data structures and possible representations have enough mathematical structure, then formal expressions of the input-output analysis can be drawn from considering perturbations of the input (Michailides and de Leeuw, 1998).",
       explanation = "The analytic and algebraic stability function in the 'gifistab' package implements this definition by calculating two condition numbers (kappa): one based on the L1 norm and another based on the Linf norm of the model. The condition number is a measure of multicollinearity, which is the degree to which the independent variables are correlated. High multicollinearity can make the model unstable under slight changes in the input.

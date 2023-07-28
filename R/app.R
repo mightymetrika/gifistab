@@ -1,3 +1,21 @@
+#' Stability App
+#'
+#' This Shiny web application allows users to perform stability assessments on
+#' data loaded from a CSV file. Users can specify the formula for the model,
+#' choose the model type, and specify various other parameters.
+#' The app will then perform the stability assessment and display the results as
+#' tables, plots, and explanations.
+#'
+#' @return A Shiny web application.
+#' @export
+#' @keywords interactive
+#'
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'   stability_app()
+#' }
+#' }
 stability_app <- function(){
   ui <- shiny::fluidPage(
     theme = shinythemes::shinytheme("spacelab"),
@@ -11,7 +29,7 @@ stability_app <- function(){
       shiny::radioButtons("model_type", "Choose Model Type:", choices = c("lm", "glm")),
       shiny::conditionalPanel(
         condition = "input.model_type == 'glm'",
-        shiny::selectInput("family", "Choose Family:", choices = c("binomial", "gaussian", "poisson", "Gamma", "inverse.gaussian", "quasi"))
+        shiny::selectInput("family", "Choose Family:", choices = c("binomial", "gaussian", "poisson", "Gamma", "inverse.gaussian", "quasipoisson", "quasibinomial"))
       ),
       shiny::numericInput("nboot", "Number of Bootstrap Resamples (Optional)", value = NULL, min = 1, max = 10000),
       shiny::textInput("variable_to_remove", "Variable to Remove (Optional)"),
