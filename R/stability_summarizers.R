@@ -97,7 +97,7 @@ summary_data_selection_stability <- function(obj, conf.int, conf.level){
 #' produced by the `stability_under_model_selection` function. The summary
 #' statistics include likelihood ratio test results for each model comparison:
 #' toggling the intercept, removing a specific variable, and removing the least
-#' useful variable.
+#' useful variables.
 #'
 #' @param obj A list object returned by `stability_under_model_selection`.
 #'

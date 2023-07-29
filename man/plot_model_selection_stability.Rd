@@ -9,16 +9,17 @@ plot_model_selection_stability(obj)
 \arguments{
 \item{obj}{A list object returned from the \code{stability_under_model_selection}
 function, containing summaries for models with the intercept toggled, a
-user-selected variable removed, and the least useful variable removed.}
+user-selected variable removed, and the least useful variables removed.}
 }
 \value{
 A ggplot2 object of the comparison of p-values among various model
-selection strategies. If there are no data to plot, the function will return \code{NULL} and issue a warning.
+selection strategies. If there are no data to plot, the function will return
+\code{NULL} and issue a warning.
 }
 \description{
 This function creates a ggplot object for the stability under model selection
 assessment. It generates a bar plot comparing p-values for the original model
 with those from models with the intercept toggled, a user-selected variable
-removed, and the least useful variable removed.
+removed, and the least useful variables removed.
 }
 \keyword{internal}

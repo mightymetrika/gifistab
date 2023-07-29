@@ -220,14 +220,15 @@ plot_data_selection_stability <- function(obj, conf.int) {
 #' This function creates a ggplot object for the stability under model selection
 #' assessment. It generates a bar plot comparing p-values for the original model
 #' with those from models with the intercept toggled, a user-selected variable
-#' removed, and the least useful variable removed.
+#' removed, and the least useful variables removed.
 #'
 #' @param obj A list object returned from the `stability_under_model_selection`
 #' function, containing summaries for models with the intercept toggled, a
-#' user-selected variable removed, and the least useful variable removed.
+#' user-selected variable removed, and the least useful variables removed.
 #'
 #' @return A ggplot2 object of the comparison of p-values among various model
-#' selection strategies. If there are no data to plot, the function will return `NULL` and issue a warning.
+#' selection strategies. If there are no data to plot, the function will return
+#' `NULL` and issue a warning.
 #'
 #' @keywords internal
 plot_model_selection_stability <- function(obj) {
@@ -295,22 +296,6 @@ plot_numerical_stability <- function(obj, conf.int) {
 
   return(p)
 }
-
-# plot_analytic_and_algebraic_stability <- function(obj) {
-#
-#   # Create a data frame for plotting
-#   plot_df <- data.frame(kappa = obj$analytic_and_algebraic_stability_summary, model = "Model")
-#
-#   # Create the plot
-#   p <- ggplot2::ggplot(plot_df, ggplot2::aes(x = model, y = kappa)) +
-#     ggplot2::geom_col(fill = "steelblue") +
-#     ggplot2::geom_hline(yintercept = 30, linetype = "dashed", color = "red") +
-#     ggplot2::annotate("text", x = 1, y = 31, label = "Kappa = 30", hjust = 0) +
-#     ggplot2::labs(y = "Kappa", x = "", title = "") +
-#     ggplot2::theme_minimal()
-#
-#   return(p)
-# }
 
 #' Create Analytic and Algebraic Stability Assessment Plot
 #'

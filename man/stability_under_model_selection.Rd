@@ -20,26 +20,48 @@ stability_under_model_selection(
 
 \item{formula}{A formula that describes the model to be fitted.}
 
-\item{variable_to_remove}{A character string specifying a variable to be removed from the model. If the variable is part of an interaction term, the interaction is removed but not the main effects.}
+\item{variable_to_remove}{A character string specifying a variable to be
+removed from the model. If the variable is part of an interaction term, the
+interaction is removed but not the main effects.}
 
-\item{variable_of_interest}{A character string or a vector of strings specifying the variable(s) of interest for the stability analysis under backward selection. If the variable of interest is part of an interaction term, all variables in the interaction are considered to be of interest.}
+\item{variable_of_interest}{A character string or a vector of strings specifying
+the variable(s) of interest for the stability analysis under backward selection.
+If the variable of interest is part of an interaction term, all variables in
+the interaction are considered to be of interest.}
 
 \item{...}{Other parameters to be passed to the \code{lmtest::lrtest} function.}
 }
 \value{
 A list with three components:
 \itemize{
-\item \code{toggle_intercept}: This is an object of class \code{lmtest::lrtest} that compares the fit of the model with and without an intercept.
-\item \code{remove_variable}: This is either an object of class \code{lmtest::lrtest} that compares the fit of the model with and without the variable specified in \code{variable_to_remove} parameter, or NULL if the \code{variable_to_remove} parameter is NULL.
-\item \code{remove_least_useful}: This is either an object of class \code{lmtest::lrtest} that compares the fit of the full model and a model obtained by backward selection that retains the variable(s) specified in \code{variable_of_interest}, or NULL if the \code{variable_of_interest} parameter is NULL.
+\item \code{toggle_intercept}: This is an object of class \code{lmtest::lrtest} that compares
+the fit of the model with and without an intercept.
+\item \code{remove_variable}: This is either an object of class \code{lmtest::lrtest} that
+compares the fit of the model with and without the variable specified in
+\code{variable_to_remove} parameter, or NULL if the \code{variable_to_remove} parameter
+is NULL.
+\item \code{remove_least_useful}: This is an object of class \code{lmtest::lrtest} that
+compares the fit of the full model and a model obtained by backward selection
+while preserving the variable(s) specified in \code{variable_of_interest}. This
+process removes variables until no further improvement in AIC is possible.
+This component is NULL if the \code{variable_of_interest} parameter is NULL.
 }
 }
 \description{
-This function assesses the stability of a model under three types of specification changes:
+This function assesses the stability of a model under three types of
+specification changes:
 \enumerate{
-\item Toggling the intercept: This involves either removing the intercept from a model that includes it or adding the intercept to a model that excludes it.
-\item Removing a specific variable: The function allows you to specify a particular variable to be removed from the model. If the specified variable is part of an interaction term, only the interaction will be removed, leaving the main effects in place.
-\item Removing the least useful variable: This approach uses a backward stepwise selection process to identify and remove the least useful variable that is not the variable of interest.
+\item Toggling the intercept: This involves either removing the intercept from a
+model that includes it or adding the intercept to a model that excludes it.
+\item Removing a specific variable: The function allows you to specify a particular
+variable to be removed from the model. If the specified variable is part of an
+interaction term, only the interaction will be removed, leaving the main effects
+in place.
+\item Removing variables through backward selection: This approach uses a backward
+stepwise selection process to remove variables that do not contribute significantly
+to the model according to the Akaike information criterion (AIC), while preserving
+the variable of interest. This process iteratively removes variables until the
+AIC cannot be further reduced by removing any other variable.
 }
 }
 \keyword{internal}
