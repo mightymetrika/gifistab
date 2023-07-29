@@ -210,22 +210,44 @@ stability_under_data_selection <- function(model, data, formula, ...) {
 
 #' Stability Under Model Selection
 #'
-#' This function assesses the stability of a model under three types of specification changes:
-#' 1. Toggling the intercept: This involves either removing the intercept from a model that includes it or adding the intercept to a model that excludes it.
-#' 2. Removing a specific variable: The function allows you to specify a particular variable to be removed from the model. If the specified variable is part of an interaction term, only the interaction will be removed, leaving the main effects in place.
-#' 3. Removing the least useful variable: This approach uses a backward stepwise selection process to identify and remove the least useful variable that is not the variable of interest.
+#' This function assesses the stability of a model under three types of
+#' specification changes:
+#' 1. Toggling the intercept: This involves either removing the intercept from a
+#' model that includes it or adding the intercept to a model that excludes it.
+#' 2. Removing a specific variable: The function allows you to specify a particular
+#' variable to be removed from the model. If the specified variable is part of an
+#' interaction term, only the interaction will be removed, leaving the main effects
+#' in place.
+#' 3. Removing variables through backward selection: This approach uses a backward
+#' stepwise selection process to remove variables that do not contribute significantly
+#' to the model according to the Akaike information criterion (AIC), while preserving
+#' the variable of interest. This process iteratively removes variables until the
+#' AIC cannot be further reduced by removing any other variable.
 #'
 #' @param model A fitted model object. This can be of class `lm` or `glm`.
 #' @param data A data frame containing the data that was used to fit the model.
 #' @param formula A formula that describes the model to be fitted.
-#' @param variable_to_remove A character string specifying a variable to be removed from the model. If the variable is part of an interaction term, the interaction is removed but not the main effects.
-#' @param variable_of_interest A character string or a vector of strings specifying the variable(s) of interest for the stability analysis under backward selection. If the variable of interest is part of an interaction term, all variables in the interaction are considered to be of interest.
+#' @param variable_to_remove A character string specifying a variable to be
+#' removed from the model. If the variable is part of an interaction term, the
+#' interaction is removed but not the main effects.
+#' @param variable_of_interest A character string or a vector of strings specifying
+#' the variable(s) of interest for the stability analysis under backward selection.
+#' If the variable of interest is part of an interaction term, all variables in
+#' the interaction are considered to be of interest.
 #' @param ... Other parameters to be passed to the `lmtest::lrtest` function.
 #'
 #' @return A list with three components:
-#' - `toggle_intercept`: This is an object of class `lmtest::lrtest` that compares the fit of the model with and without an intercept.
-#' - `remove_variable`: This is either an object of class `lmtest::lrtest` that compares the fit of the model with and without the variable specified in `variable_to_remove` parameter, or NULL if the `variable_to_remove` parameter is NULL.
-#' - `remove_least_useful`: This is either an object of class `lmtest::lrtest` that compares the fit of the full model and a model obtained by backward selection that retains the variable(s) specified in `variable_of_interest`, or NULL if the `variable_of_interest` parameter is NULL.
+#' - `toggle_intercept`: This is an object of class `lmtest::lrtest` that compares
+#' the fit of the model with and without an intercept.
+#' - `remove_variable`: This is either an object of class `lmtest::lrtest` that
+#' compares the fit of the model with and without the variable specified in
+#' `variable_to_remove` parameter, or NULL if the `variable_to_remove` parameter
+#' is NULL.
+#' - `remove_least_useful`: This is an object of class `lmtest::lrtest` that
+#' compares the fit of the full model and a model obtained by backward selection
+#' while preserving the variable(s) specified in `variable_of_interest`. This
+#' process removes variables until no further improvement in AIC is possible.
+#' This component is NULL if the `variable_of_interest` parameter is NULL.
 #'
 #' @keywords internal
 stability_under_model_selection <- function(model, data, formula, variable_to_remove = NULL, variable_of_interest = NULL, ...) {

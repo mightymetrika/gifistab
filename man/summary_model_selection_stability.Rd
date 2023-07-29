@@ -21,6 +21,6 @@ This function extracts and tidies the summary statistics for each model
 produced by the \code{stability_under_model_selection} function. The summary
 statistics include likelihood ratio test results for each model comparison:
 toggling the intercept, removing a specific variable, and removing the least
-useful variable.
+useful variables.
 }
 \keyword{internal}
