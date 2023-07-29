@@ -100,15 +100,6 @@ stability_app <- function(){
       }
     })
 
-    # stability_results <- shiny::eventReactive(input$go, {
-    #   shiny::req(input$datafile)  # Ensure a file has been uploaded
-    #   data <- utils::read.csv(input$datafile$datapath)
-    #   new_data <- if (!is.null(input$newdatafile$datapath)) utils::read.csv(input$newdatafile$datapath) else NULL
-    #   formula <- stats::as.formula(input$formula)
-    #   engine <- if (input$model_type == "lm") stats::lm else stats::glm
-    #   family <- if (input$model_type == "glm") get(input$family)() else NULL
-    #   stability_assessment(data, formula, engine, new_data = new_data, nboot = input$nboot, variable_to_remove = input$variable_to_remove, variable_of_interest = input$variable_of_interest, family = family, seed = input$seed)
-    # }, ignoreNULL = FALSE)
     stability_results <- shiny::eventReactive(input$go, {
       shiny::req(input$datafile)  # Ensure a file has been uploaded
       data <- utils::read.csv(input$datafile$datapath)
@@ -174,10 +165,40 @@ stability_app <- function(){
     })
 
     output$summary_table <- shiny::renderUI({
+      # Check if "Perform Stability Assessment" button has been clicked
+      if (input$go > 0) {
+        # Check if Replication Stability and Bootstrap Models are selected and nboot is not provided
+        if (input$stability_type == "Replication Stability" && input$stability_subtype == "Bootstrap Models" && is.na(input$nboot)) {
+          shiny::h3("Please complete the Number of Bootstrap Resamples argument to view this stability assessment")
+        } else if (input$stability_type == "Replication Stability" && input$stability_subtype == "New Model" && is.null(input$newdatafile$datapath)) {
+          shiny::h3("Please complete the New CSV File argument to view this stability assessment.")
+        } else {
+          summary_type <- get_summary_type(input)
+          # Check if Stability under Model Selection is selected and either variable_to_remove or variable_of_interest are not provided
+          if (input$stability_type == "Stability under Model Selection") {
+            if (input$variable_to_remove == "" && input$variable_of_interest == "") {
+              renderSummaryTable(summary_type, c("toggle_intercept"))
+            } else if (input$variable_to_remove == "") {
+              renderSummaryTable(summary_type, c("toggle_intercept", "remove_least_useful"))
+            } else if (input$variable_of_interest == "") {
+              renderSummaryTable(summary_type, c("toggle_intercept", "remove_variable"))
+            } else {
+              renderSummaryTable(summary_type, c("toggle_intercept", "remove_variable", "remove_least_useful"))
+            }
+          } else {
+            renderSummaryTable(summary_type)
+          }
+        }
+      }
+    })
+
+    renderSummaryTable <- function(summary_type, tables = NULL) {
       shiny::req(stability_results())
-      summary_type <- get_summary_type(input)
       summary <- eval(parse(text = paste0("stability_results()$gstab_summary$", summary_type)))
       if (is_list_of_dataframes(summary)) {
+        if (!is.null(tables)) {
+          summary <- summary[tables]
+        }
         do.call(shiny::tagList, lapply(names(summary), function(name) {
           list(
             shiny::h3(tools::toTitleCase(gsub("summary", "", gsub("_", " ", name)))),
@@ -197,7 +218,8 @@ stability_app <- function(){
           DT::dataTableOutput("single_summary")
         )
       }
-    })
+    }
+
 
     output$stability_plot <- shiny::renderPlot({
       shiny::req(stability_results())
