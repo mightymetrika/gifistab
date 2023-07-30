@@ -15,6 +15,7 @@ stability_assessment(
   conf.int = TRUE,
   conf.level = 0.95,
   seed = NULL,
+  nf = 0.05,
   ...
 )
 }
@@ -48,6 +49,11 @@ TRUE. Defaults to 0.95.}
 \item{seed}{An optional integer that sets the seed for the random number
 generator in order to obtain reproducible results. If NULL (default), the
 random number generation will not be reproducible.}
+
+\item{nf}{Noise factor as a percentage. For non-binomial families, this is used to
+determine the standard deviation of the noise added to the transformed response
+variable. For binomial families with a binary response, this is used to determine
+the fraction of the response variable to flip (i.e., change 0 to 1 or 1 to 0).}
 
 \item{...}{Additional arguments to be passed to the \code{engine} function.}
 }

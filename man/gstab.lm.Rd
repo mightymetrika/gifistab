@@ -10,6 +10,7 @@
   nboot = NULL,
   variable_to_remove = NULL,
   variable_of_interest = NULL,
+  nf = 0.05,
   ...
 )
 }
@@ -27,6 +28,11 @@ selection test. If NULL (default), no variable is removed.}
 
 \item{variable_of_interest}{Variable to consider for backward selection in the
 stability under model selection test. If NULL (default), no variable is considered.}
+
+\item{nf}{Noise factor as a percentage. For non-binomial families, this is used to
+determine the standard deviation of the noise added to the transformed response
+variable. For binomial families with a binary response, this is used to determine
+the fraction of the response variable to flip (i.e., change 0 to 1 or 1 to 0).}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

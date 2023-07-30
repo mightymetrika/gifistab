@@ -33,6 +33,10 @@ gstab <- function(model, ...) {
 #' selection test. If NULL (default), no variable is removed.
 #' @param variable_of_interest Variable to consider for backward selection in the
 #' stability under model selection test. If NULL (default), no variable is considered.
+#' @param nf Noise factor as a percentage. For non-binomial families, this is used to
+#' determine the standard deviation of the noise added to the transformed response
+#' variable. For binomial families with a binary response, this is used to determine
+#' the fraction of the response variable to flip (i.e., change 0 to 1 or 1 to 0).
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A list with the original model and the results of each stability check.
@@ -44,7 +48,7 @@ gstab <- function(model, ...) {
 #' @keywords internal
 gstab.lm <- function(model, new_data = NULL, nboot = NULL,
                      variable_to_remove = NULL,
-                     variable_of_interest = NULL, ...) {
+                     variable_of_interest = NULL, nf = 0.05, ...) {
 
   # Extract data and formula from the model
   data <- model$model
@@ -52,7 +56,7 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL,
 
   # Apply each type of stability
   replication_stability_results <- replication_stability(model, data, formula, new_data, nboot, ...)
-  statistical_stability_results <- statistical_stability(model, data, formula, ...)
+  statistical_stability_results <- statistical_stability(model, data, formula, nf = nf, ...)
   stability_under_data_selection_results <- stability_under_data_selection(model, data, formula, ...)
   stability_under_model_selection_results <- stability_under_model_selection(model, data, formula, variable_to_remove, variable_of_interest, ...)
   numerical_stability_results <- numerical_stability(model, data, formula, ...)
@@ -93,6 +97,10 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL,
 #' selection test. If NULL (default), no variable is removed.
 #' @param variable_of_interest Variable to consider for backward selection in the
 #' stability under model selection test. If NULL (default), no variable is considered.
+#' @param nf Noise factor as a percentage. For non-binomial families, this is used to
+#' determine the standard deviation of the noise added to the transformed response
+#' variable. For binomial families with a binary response, this is used to determine
+#' the fraction of the response variable to flip (i.e., change 0 to 1 or 1 to 0).
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @return A list with the original model and the results of each stability check.
@@ -102,7 +110,7 @@ gstab.lm <- function(model, new_data = NULL, nboot = NULL,
 #' @keywords internal
 gstab.glm <- function(model, new_data = NULL, nboot = NULL,
                       variable_to_remove = NULL,
-                      variable_of_interest = NULL, ...) {
+                      variable_of_interest = NULL, nf = 0.05, ...) {
 
   # Extract data and formula from the model
   data <- model$model
@@ -110,7 +118,7 @@ gstab.glm <- function(model, new_data = NULL, nboot = NULL,
 
   # Apply each type of stability
   replication_stability_results <- replication_stability(model, data, formula, new_data, nboot, ...)
-  statistical_stability_results <- statistical_stability(model, data, formula, ...)
+  statistical_stability_results <- statistical_stability(model, data, formula, nf = nf, ...)
   stability_under_data_selection_results <- stability_under_data_selection(model, data, formula, ...)
   stability_under_model_selection_results <- stability_under_model_selection(model, data, formula, variable_to_remove, variable_of_interest, ...)
   numerical_stability_results <- numerical_stability(model, data, formula, ...)
