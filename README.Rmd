@@ -19,19 +19,20 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The gifistab R package aims to provide a robust framework for the stability assessment of statistical models. This framework, based on the broad definitions of seven types of stability as presented in [Michailides and de Leeuw (1998)](https://escholarship.org/uc/item/0789f7d3), includes:
-(a) Replication Stability. Given a newly sampled dataset, the application of the same technique should yield results that do not change dramatically.
 
-(b) Statistical Stability. This refers to the stability of the analysis when no new dataset is formally sampled.
+1) Replication Stability. Given a newly sampled dataset, the application of the same technique should yield results that do not change dramatically.
 
-(c) Stability under Data Selection. This involves considering variations in data by either omitting objects from the dataset or variables from the subsequent analysis. The former corresponds to the rejection of outliers and resampling techniques. Resampling techniques can be considered a form of replication stability without the formal sampling of a new dataset.
+2) Statistical Stability. This refers to the stability of the analysis when no new dataset is formally sampled.
 
-(d) Stability under Model Selection. Small changes in the model should yield only minor alterations in the results.
+3) Stability under Data Selection. This involves considering variations in data by either omitting objects from the dataset or variables from the subsequent analysis. The former corresponds to the rejection of outliers and resampling techniques. Resampling techniques can be considered a form of replication stability without the formal sampling of a new dataset.
 
-(e) Numerical Stability. This refers to the impact of rounding errors and computations with limited precision on the results produced by the techniques.
+4) Stability under Model Selection. Small changes in the model should yield only minor alterations in the results.
 
-(f) Analytic and Algebraic Stability. Given sufficient mathematical structure in the data and potential representations, formal expressions of the input-output analysis can be derived by considering perturbations of the input.
+5) Numerical Stability. This refers to the impact of rounding errors and computations with limited precision on the results produced by the techniques.
 
-(g) Stability under Selection of Technique. The application of different techniques to the same dataset, with the goal of answering the same question, should yield approximately the same information.
+6) Analytic and Algebraic Stability. Given sufficient mathematical structure in the data and potential representations, formal expressions of the input-output analysis can be derived by considering perturbations of the input.
+
+7) Stability under Selection of Technique. The application of different techniques to the same dataset, with the goal of answering the same question, should yield approximately the same information.
 
 ## Installation
 

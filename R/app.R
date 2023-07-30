@@ -11,10 +11,9 @@
 #' @keywords interactive
 #'
 #' @examples
-#' \dontrun{
+#' # Only run this example in interactive R sessions
 #' if(interactive()){
 #'   stability_app()
-#' }
 #' }
 stability_app <- function(){
   ui <- shiny::fluidPage(
@@ -35,6 +34,7 @@ stability_app <- function(){
       shiny::textInput("variable_to_remove", "Variable to Remove (Optional)"),
       shiny::textInput("variable_of_interest", "Variable of Interest (Optional)"),
       shiny::numericInput("nf", "Noise Factor", value = 0.05, min = 0, max = 1),
+      shiny::numericInput("conf_level", "Confidence Level:", value = 0.95, min = 0, max = 1),
       shiny::numericInput("seed", "Random Number Seed (Optional for Reproducibility)", value = NA, min = 1, max = .Machine$integer.max),
       shiny::actionButton("go", "Perform Stability Assessment"),
       shiny::br(),  # Add a line break
@@ -112,9 +112,8 @@ stability_app <- function(){
       variable_to_remove <- if (!is.null(input$variable_to_remove) && nzchar(input$variable_to_remove)) input$variable_to_remove else NULL
       variable_of_interest <- if (!is.null(input$variable_of_interest) && nzchar(input$variable_of_interest)) input$variable_of_interest else NULL
       seed <- if (!is.na(input$seed)) input$seed else NULL
-      nf <- input$nf
 
-      stability_assessment(data, formula, engine, new_data = new_data, nboot = nboot, variable_to_remove = variable_to_remove, variable_of_interest = variable_of_interest, family = family, seed = seed, nf = input$nf)
+      stability_assessment(data, formula, engine, new_data = new_data, nboot = nboot, variable_to_remove = variable_to_remove, variable_of_interest = variable_of_interest, conf.level = input$conf_level, seed = seed, nf = input$nf)
     }, ignoreNULL = FALSE)
 
     # Server code to render the title and subtitle

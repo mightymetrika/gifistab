@@ -10,16 +10,16 @@ Description: Stability assessment evaluates the consistency of statistical
     statistical model. Such changes should only result in minor variations to
     parameter estimates, standard errors, confidence intervals, and other
     statistical outputs that underpin the inferences. The 'gifistab' package is
-    designed for performing stability assessments as a crucial component of
-    statistical analysis. This package draws on the framework proposed by Michailides
-    and de Leeuw <https://escholarship.org/uc/item/0789f7d3>, encompassing seven
+    designed for performing stability assessments as a component of statistical
+    analysis. This package draws on the framework proposed by Michailides and
+    de Leeuw (1998) <https://escholarship.org/uc/item/0789f7d3>, encompassing seven
     types of stability assessments: replication stability, statistical stability,
     stability under data selection, stability under model selection, numerical
     stability, analytic and algebraic stability, and stability under the selection
     of technique. The stability_assessment() function in 'gifistab' conducts a
     stability assessment following the outlined framework, while the
     stability_app() function facilitates interactive stability assessments
-    through a 'shiny' application.
+    through a web application built with 'shiny'.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
