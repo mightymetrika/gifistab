@@ -10,9 +10,11 @@ The gifistab R package aims to provide a robust framework for the
 stability assessment of statistical models. This framework, based on the
 broad definitions of seven types of stability as presented in
 [Michailides and de Leeuw
-(1998)](https://escholarship.org/uc/item/0789f7d3), includes: (a)
-Replication Stability. Given a newly sampled dataset, the application of
-the same technique should yield results that do not change dramatically.
+(1998)](https://escholarship.org/uc/item/0789f7d3), includes:
+
+1)  Replication Stability. Given a newly sampled dataset, the
+    application of the same technique should yield results that do not
+    change dramatically.
 
 2)  Statistical Stability. This refers to the stability of the analysis
     when no new dataset is formally sampled.
@@ -108,4 +110,7 @@ stab_res$gstab_explainer$`Stability under Selection of Technique`
 #> 
 #> $interpretation
 #> [1] "The results of the stability under selection of technique function can be used to assess the robustness of a model to different fitting techniques. If the results of the two models are similar, then the model is considered to be robust. However, if the results of the two models are different, then the model may be unstable under different fitting techniques."
+#> 
+#> $caution
+#> [1] "While the stability under selection of technique function is a valuable tool for assessing the stability of a model, there are a few important considerations to keep in mind:\n\n      Firstly, the function assesses stability by comparing the results of a regular regression model and a robust regression model. While this can provide valuable insights, it's important to remember that these are just two of many possible modeling techniques. The function does not consider other potential techniques, such as non-linear models, ensemble models, or non-parametric methods.\n\n      Secondly, robust regression methods are designed to be less sensitive to outliers and high leverage observations than regular regression. This means that differences between the regular and robust models could be due to these types of observations. Before concluding that a model is unstable under different techniques, it could be helpful to examine the data for outliers and high leverage points.\n\n      Thirdly, the function uses the 'lmrob' and 'glmrob' functions from the 'robustbase' package for fitting the robust models. These functions use specific algorithms and settings for robust regression. Different results might be obtained with other robust regression methods or settings.\n\n      Finally, the function returns NULL if the robust regression model could not be fitted. This could happen for a variety of reasons, including numerical issues or problems with the data. If the function returns NULL, it's important to investigate why the robust model could not be fitted.\n\n      Therefore, while the results from the stability under selection of technique function can provide useful insights into the stability of a model, they should be interpreted as part of a broader analysis of model stability and robustness."
 ```

@@ -17,10 +17,9 @@ The app will then perform the stability assessment and display the results as
 tables, plots, and explanations.
 }
 \examples{
-\dontrun{
+# Only run this example in interactive R sessions
 if(interactive()){
   stability_app()
-}
 }
 }
 \keyword{interactive}

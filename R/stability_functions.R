@@ -183,8 +183,13 @@ stability_under_data_selection <- function(model, data, formula, ...) {
       no_outlier_model <- fit_model(formula, data = no_outlier_data, ...)
     }
   }, error = function(e) {
-    # Fallback: remove data points that are more than 3 standard deviations away from the mean
-    is_outlier <- apply(data, 2, function(x) abs(scale(x)) > 3)
+    # Fallback: remove data points that fall outside of Q1 - 1.5*IQR or Q3 + 1.5*IQR
+    is_outlier <- apply(data, 2, function(x) {
+      IQR_x <- stats::IQR(x, na.rm = TRUE)
+      Q1 <- stats::quantile(x, 0.25, na.rm = TRUE)
+      Q3 <- stats::quantile(x, 0.75, na.rm = TRUE)
+      x < (Q1 - 1.5 * IQR_x) | x > (Q3 + 1.5 * IQR_x)
+    })
     no_outlier_data <- data[!rowSums(is_outlier), ]
     if (nrow(no_outlier_data) > 0) {
       no_outlier_model <- fit_model(formula, data = no_outlier_data, ...)

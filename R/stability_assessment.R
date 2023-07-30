@@ -107,6 +107,11 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
     }
   }
 
+  # Check that nf is a numeric value between 0 and 1
+  if (!is.numeric(nf) || length(nf) != 1 || nf < 0 || nf > 1) {
+    stop("nf must be a numeric value between 0 and 1.")
+  }
+
   # Set random number seed
   if (!is.null(seed)) {
     set.seed(seed)
