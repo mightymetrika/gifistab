@@ -27,6 +27,10 @@
 #' @param seed An optional integer that sets the seed for the random number
 #' generator in order to obtain reproducible results. If NULL (default), the
 #' random number generation will not be reproducible.
+#' @param nf Noise factor as a percentage. For non-binomial families, this is used to
+#' determine the standard deviation of the noise added to the transformed response
+#' variable. For binomial families with a binary response, this is used to determine
+#' the fraction of the response variable to flip (i.e., change 0 to 1 or 1 to 0).
 #' @param ... Additional arguments to be passed to the `engine` function.
 #'
 #' @return A list containing the results of the stability assessment. The list
@@ -47,7 +51,7 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
                                  nboot = NULL, variable_to_remove = NULL,
                                  variable_of_interest = NULL,
                                  conf.int = TRUE, conf.level = 0.95, seed = NULL,
-                                 ...) {
+                                 nf = 0.05, ...) {
 
   # Check that data is a data frame
   if (!is.data.frame(data)) {
@@ -112,7 +116,7 @@ stability_assessment <- function(data, formula, engine, new_data = NULL,
   fit_model <- do.call(engine, c(list(formula, data = data), list(...)))
 
   # Perform stability assessment
-  gstab_result <- gstab(fit_model, new_data = new_data, nboot = nboot, variable_to_remove = variable_to_remove, variable_of_interest = variable_of_interest, ...)
+  gstab_result <- gstab(fit_model, new_data = new_data, nboot = nboot, variable_to_remove = variable_to_remove, variable_of_interest = variable_of_interest, nf = nf, ...)
 
   # Generate summary of stability assessment
   gstab_summary_result <- summary(gstab_result, conf.int, conf.level)

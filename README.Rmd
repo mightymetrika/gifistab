@@ -1,0 +1,77 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# gifistab
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The gifistab R package aims to provide a robust framework for the stability assessment of statistical models. This framework, based on the broad definitions of seven types of stability as presented in [Michailides and de Leeuw (1998)](https://escholarship.org/uc/item/0789f7d3), includes:
+(a) Replication Stability. Given a newly sampled dataset, the application of the same technique should yield results that do not change dramatically.
+
+(b) Statistical Stability. This refers to the stability of the analysis when no new dataset is formally sampled.
+
+(c) Stability under Data Selection. This involves considering variations in data by either omitting objects from the dataset or variables from the subsequent analysis. The former corresponds to the rejection of outliers and resampling techniques. Resampling techniques can be considered a form of replication stability without the formal sampling of a new dataset.
+
+(d) Stability under Model Selection. Small changes in the model should yield only minor alterations in the results.
+
+(e) Numerical Stability. This refers to the impact of rounding errors and computations with limited precision on the results produced by the techniques.
+
+(f) Analytic and Algebraic Stability. Given sufficient mathematical structure in the data and potential representations, formal expressions of the input-output analysis can be derived by considering perturbations of the input.
+
+(g) Stability under Selection of Technique. The application of different techniques to the same dataset, with the goal of answering the same question, should yield approximately the same information.
+
+## Installation
+
+You can install the development version of gifistab from GitHub using [devtools](https://devtools.r-lib.org/):
+
+```{r, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("mightymetrika/gifistab")
+```
+
+## Example
+
+The following is a basic example illustrating how to perform a stability assessment using the stats::lm engine:
+
+```{r example}
+library(gifistab)
+
+stab_res <- suppressWarnings(stability_assessment(data = n20_seed376_lm, # Input data frame
+                                                  new_data = n20_seed500_lm, # A new data frame
+                                                  nboot = 1000,
+                                                  variable_to_remove = "x2",
+                                                  variable_of_interest = "x1",
+                                                  formula = y ~ x1 + x2,
+                                                  engine = stats::lm,
+                                                  seed = 184))
+```
+
+
+From the stab_res object, you can further explore the type of stability assessment you're interested in by accessing summary tables, plots, and explanations. For instance, you can explore the 'Stability under Selection of Technique' assessment as follows:
+
+```{r}
+# View table for the original model
+stab_res$gstab_summary$original_summary
+
+# View table for the stability under selection of technique model
+stab_res$gstab_summary$technique_stability_summary
+
+# View plot
+stab_res$gstab_plot$technique_stability_plot
+
+# View explanation
+stab_res$gstab_explainer$`Stability under Selection of Technique`
+```
